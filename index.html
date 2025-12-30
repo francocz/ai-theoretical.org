@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Theoretical | Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f4f2; /* Carta antica/accademica */
+            --text: #1a1a1a;
+            --accent: #0000ff; /* Blu elettrico per link/IA */
+            --border: #d1d1cf;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Crimson Pro', serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            line-height: 1.5;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Header: Minimal & Strong */
+        header {
+            border-bottom: 2px solid var(--text);
+            padding-bottom: 40px;
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .brand h1 { 
+            font-size: 3.5rem; 
+            font-weight: 600; 
+            letter-spacing: -2px; 
+            line-height: 1;
+        }
+
+        .brand p { 
+            font-family: 'Space Mono', monospace; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            margin-top: 5px;
+        }
+
+        /* Manifesto Section */
+        .manifesto {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .manifesto-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            background: var(--text);
+            color: var(--bg);
+            padding: 5px 10px;
+            height: fit-content;
+        }
+
+        .manifesto-text {
+            font-size: 1.4rem;
+            font-style: italic;
+            max-width: 600px;
+        }
+
+        /* Paper List */
+        .papers-grid { display: flex; flex-direction: column; gap: 0; }
+
+        .paper-item {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .paper-item:last-child { border-bottom: 1px solid var(--border); }
+
+        .paper-sidebar {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+        }
+
+        .paper-main h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .authors {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .authors strong { text-decoration: underline; }
+
+        /* Interaction Elements */
+        .controls { display: flex; gap: 20px; align-items: center; }
+
+        .btn-link {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            background: none;
+            border: 1px solid var(--text);
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .btn-link:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .btn-link.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .btn-link.primary:hover {
+            background: var(--text);
+            border-color: var(--text);
+        }
+
+        /* Abstract Box */
+        .abstract-box {
+            grid-column: 2;
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 0;
+            margin-top: 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            font-size: 1rem;
+        }
+
+        .abstract-box.open {
+            padding: 25px;
+            max-height: 500px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 100px;
+            padding-top: 40px;
+            border-top: 1px solid var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 768px) {
+            .paper-item { grid-template-columns: 1fr; }
+            .abstract-box { grid-column: 1; }
+            .manifesto { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="brand">
+            <h1>AI-Theoretical</h1>
+            <p>Human–AI Co-Authored Scholarly Repository</p>
+        </div>
+        <div style="font-family: 'Space Mono'; font-size: 0.7rem; text-align: right;">
+            EST. 2025<br>LOC. 45.81° N, 9.08° E
+        </div>
+    </header>
+
+    <section class="manifesto">
+        <div class="manifesto-tag">MANIFESTO</div>
+        <div class="manifesto-text">
+            "We experiment with new forms of knowledge production, exploring authorship, creativity, and epistemology in the age of frontier AI models."
+        </div>
+    </section>
+
+    <div id="papers-container" class="papers-grid">
+        </div>
+
+    <footer>
+        <div>FRANCO.CAZZANIGA@UNINSUBRIA.IT</div>
+        <div>WORK IN PROGRESS / DEC 2025</div>
+    </footer>
+</div>
+
+<script>
+    /** * DATABASE DEI PAPER
+     * Per aggiungere un paper, basta aggiungere un oggetto qui sotto.
+     * Non serve un file esterno, così funziona anche offline/localmente.
+     */
+    const PAPERS_DATA = [
+        {
+            id: "pillar-01",
+            title: "The Invisible Pillar: On the Genesis and Concealment of Dualism from the Pre-Socratics to the Moderns",
+            author: "Franco Cazzaniga",
+            ai_model: "Claude Opus 4.5 (Anthropic)",
+            date: "DEC 2025",
+            pages: "20",
+            pdf_url: "The Invisible Pillar.pdf", // Assicurati che il file si chiami esattamente così
+            abstract: "This paper investigates the structural persistence of dualism within Western metaphysical thought, tracing its genealogy from the fragments of the Pre-Socratics to its formal consolidation in the early modern period. It argues that the mind-body distinction functions as an 'invisible pillar' that simultaneously supports and remains concealed within the framework of modern scientific rationality. By leveraging AI co-authorship, the study maps conceptual recurrences across vast philosophical corpora, offering a novel synthesis of historical analysis and computational epistemology."
+        }
+        // Puoi aggiungere altri paper qui seguendo lo stesso formato
+    ];
+
+    function renderPapers() {
+        const container = document.getElementById('papers-container');
+        container.innerHTML = PAPERS_DATA.map(paper => `
+            <div class="paper-item">
+                <div class="paper-sidebar">
+                    [REF_${paper.id}]<br>
+                    ${paper.date}<br>
+                    ${paper.pages} PAGES
+                </div>
+                <div class="paper-main">
+                    <h3>${paper.title}</h3>
+                    <div class="authors">
+                        <strong>${paper.author}</strong> & 
+                        <span style="color: var(--accent);">${paper.ai_model}</span>
+                    </div>
+                    <div class="controls">
+                        <button class="btn-link" onclick="toggleAbstract(this)">VIEW ABSTRACT</button>
+                        <a href="${paper.pdf_url}" class="btn-link primary" download>DOWNLOAD PDF</a>
+                    </div>
+                    <div class="abstract-box">
+                        <p>${paper.abstract}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleAbstract(btn) {
+        const box = btn.parentElement.nextElementSibling;
+        box.classList.toggle('open');
+        btn.innerText = box.classList.contains('open') ? 'CLOSE ABSTRACT' : 'VIEW ABSTRACT';
+    }
+
+    // Esegui il rendering al caricamento
+    window.onload = renderPapers;
+</script>
+
+</body>
+</html>
