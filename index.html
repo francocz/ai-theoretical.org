@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Theoretical | Human–AI Co-Authored Papers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a; /* Slate 900 */
+            --accent: #2563eb;  /* Blue 600 */
+            --bg: #fcfcfd;
+            --text: #334155;
+            --card-bg: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0 1rem;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* Header & Hero */
+        header {
+            padding: 5rem 0 3rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: var(--primary);
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Manifesto Section */
+        .manifesto-box {
+            background: var(--primary);
+            color: #f1f5f9;
+            padding: 2.5rem;
+            border-radius: 24px;
+            margin-bottom: 4rem;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .manifesto-box h2 {
+            color: #fff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .manifesto-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            border-left: 2px solid var(--accent);
+            padding-left: 1.5rem;
+        }
+
+        /* Paper Section */
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .paper-card {
+            background: var(--card-bg);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .paper-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        .paper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .paper-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            line-height: 1.3;
+            max-width: 80%;
+        }
+
+        .date-badge {
+            font-size: 0.85rem;
+            background: #eff6ff;
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 600;
+        }
+
+        .authors {
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .ai-label {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Abstract Toggle System */
+        .abstract-trigger {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: var(--text);
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .abstract-trigger:hover {
+            background: #f1f5f9;
+        }
+
+        .abstract-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .abstract-content.open {
+            max-height: 500px; /* Altezza massima arbitraria */
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        /* Action Buttons */
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-download:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: #f1f5f9;
+            padding: 3rem;
+            border-radius: 24px;
+            text-align: center;
+            margin: 4rem 0;
+        }
+
+        .cta-section a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .paper-header { flex-direction: column; gap: 10px; }
+            .paper-title { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="subtitle">Journal & Repository</div>
+        <h1>AI-Theoretical</h1>
+    </header>
+
+    <section class="manifesto-box">
+        <h2><span>◈</span> Manifesto (Draft)</h2>
+        <div class="manifesto-text">
+            Questa piattaforma raccoglie e pubblica saggi accademici scritti in collaborazione tra esseri umani e modelli di IA di frontiera. Ogni contributo dichiara in modo trasparente il ruolo dell'IA. I lavori sono sottoposti a revisione da parte di modelli di IA indipendenti. L'obiettivo è sperimentare nuove forme di produzione della conoscenza e riflettere su autorialità, creatività ed epistemologia nell'era dell'intelligenza artificiale.
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">Papers</h2>
+
+        <div class="paper-card">
+            <div class="paper-header">
+                <div class="paper-title">The Invisible Pillar: On the Genesis and Concealment of Dualism from the Pre-Socratics to the Moderns</div>
+                <div class="date-badge">Dicembre 2025</div>
+            </div>
+
+            <div class="authors">
+                <strong>Franco Cazzaniga</strong> 
+                <span style="margin: 0 10px; color: #cbd5e1;">&</span> 
+                <span class="ai-label">Claude Opus 4.5 (Anthropic)</span>
+            </div>
+
+            <button class="abstract-trigger" onclick="toggleAbstract(this)">
+                <span>＋</span> Leggi l'Abstract
+            </button>
+            
+            <div class="abstract-content">
+                <strong>Abstract:</strong> Questo saggio esplora le radici profonde del dualismo nel pensiero occidentale. Dall'analisi dei frammenti pre-socratici fino alla formalizzazione moderna, il lavoro indaga come la distinzione tra mente e corpo sia stata sistematicamente occultata e riscoperta. La co-autorialità con l'IA ha permesso di analizzare vasti dataset testuali per mappare ricorrenze linguistiche e concettuali altrimenti invisibili.
+            </div>
+
+            <a href="https://ai-theoretical.org/The Invisible Pillar.pdf" class="btn-download">
+                📥 Scarica PDF (20 pagine)
+            </a>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h3>Submit your paper</h3>
+        <p style="margin-top: 10px;">Interessato a partecipare alla sperimentazione?</p>
+        <p>Contatta: <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a></p>
+    </section>
+
+    <footer>
+        Launching December 2025 — Work in Progress<br>
+        AI-Theoretical.org
+    </footer>
+</div>
+
+<script>
+    function toggleAbstract(btn) {
+        const content = btn.nextElementSibling;
+        content.classList.toggle('open');
+        
+        const span = btn.querySelector('span');
+        if (content.classList.contains('open')) {
+            span.innerText = '－';
+            btn.style.background = '#e2e8f0';
+        } else {
+            span.innerText = '＋';
+            btn.style.background = '#f8fafc';
+        }
+    }
+</script>
+
+</body>
+</html>
