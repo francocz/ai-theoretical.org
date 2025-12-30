@@ -4,316 +4,259 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-Theoretical | Human–AI Co-Authored Theoretical Papers</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,600;1,300&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0f172a; /* Slate 900 */
-            --accent: #2563eb;  /* Blue 600 */
-            --bg: #fcfcfd;
-            --text: #334155;
-            --card-bg: #ffffff;
+            --bg: #ffffff;
+            --paper-bg: #fdfdfc;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --accent: #2563eb;
+            --border: #e5e5e0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            padding: 0 1rem;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 850px;
-            margin: 0 auto;
-        }
+        /* Layout raffinato */
+        .wrapper { max-width: 1000px; margin: 0 auto; padding: 0 40px; }
 
+        /* Header sofisticato */
         header {
-            padding: 5rem 0 3rem;
-            text-align: center;
+            padding: 100px 0 60px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            display: block;
         }
 
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            color: var(--primary);
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
+            font-size: 4rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -2px;
         }
 
-        .subtitle {
-            font-size: 1.1rem;
-            color: var(--accent);
+        /* Manifesto con stile "Brutalism-Light" */
+        .manifesto-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 60px;
+            margin-bottom: 100px;
+        }
+
+        .manifesto-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            border-top: 2px solid var(--text-main);
+            padding-top: 10px;
+            height: fit-content;
         }
 
-        /* Manifesto Section */
-        .manifesto-box {
-            background: var(--primary);
-            color: #f1f5f9;
-            padding: 2.5rem;
-            border-radius: 24px;
-            margin-bottom: 4rem;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-        }
-
-        .manifesto-box h2 {
-            color: #fff;
-            margin-bottom: 1.2rem;
-            font-size: 1.4rem;
-            font-family: 'Playfair Display', serif;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .manifesto-text {
-            font-size: 1.1rem;
-            opacity: 0.95;
+        .manifesto-content {
+            font-size: 1.25rem;
             font-weight: 300;
-            border-left: 2px solid var(--accent);
-            padding-left: 1.5rem;
+            font-style: italic;
+            color: var(--text-muted);
         }
 
-        /* Section Titles */
-        .section-title {
+        /* Repository / Papers list */
+        .repository-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2.2rem;
-            margin-bottom: 2rem;
-            color: var(--primary);
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 0.5rem;
+            font-size: 2rem;
+            margin-bottom: 40px;
         }
 
-        /* Paper Card */
-        .paper-card {
-            background: var(--card-bg);
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 2.5rem;
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
+        .paper-list { display: flex; flex-direction: column; gap: 40px; }
+
+        .paper-entry {
+            border-left: 1px solid var(--border);
+            padding-left: 30px;
+            padding-bottom: 40px;
+            transition: 0.3s ease;
         }
 
-        .paper-card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 12px 20px -5px rgba(0,0,0,0.05);
-        }
+        .paper-entry:hover { border-left-color: var(--accent); }
 
-        .paper-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.2rem;
+        .paper-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 10px;
         }
 
         .paper-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary);
-            line-height: 1.3;
-            max-width: 85%;
-        }
-
-        .date-badge {
-            font-size: 0.85rem;
-            background: #eff6ff;
-            color: var(--accent);
-            padding: 4px 14px;
-            border-radius: 99px;
-            font-weight: 600;
-        }
-
-        .authors {
-            margin-bottom: 1.5rem;
-            font-size: 1.05rem;
-            color: #475569;
-        }
-
-        .ai-label {
-            color: var(--accent);
-            font-weight: 600;
-            border-bottom: 1px dotted var(--accent);
-        }
-
-        /* Abstract Toggle System */
-        .abstract-trigger {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: var(--primary);
-            padding: 0.8rem 1.4rem;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.2s;
-            margin-bottom: 1rem;
-            font-size: 0.95rem;
-        }
-
-        .abstract-trigger:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-        }
-
-        .abstract-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
-            background: #f8fafc;
-            border-radius: 10px;
-            font-size: 1rem;
-            color: #334155;
-        }
-
-        .abstract-content.open {
-            max-height: 1000px; 
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e2e8f0;
-        }
-
-        /* Download Button */
-        .btn-download {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--accent);
-            color: white;
-            text-decoration: none;
-            padding: 0.9rem 1.8rem;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-        }
-
-        .btn-download:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-        }
-
-        /* Submission Section */
-        .cta-section {
-            background: #f1f5f9;
-            padding: 3.5rem;
-            border-radius: 24px;
-            text-align: center;
-            margin: 5rem 0;
-        }
-
-        .cta-section h3 {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
-            margin-bottom: 1rem;
+            margin-bottom: 15px;
+            line-height: 1.3;
         }
 
-        .cta-section a {
-            color: var(--accent);
-            text-decoration: none;
+        .paper-authors {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            color: var(--text-muted);
+        }
+
+        .paper-authors strong { color: var(--text-main); font-weight: 600; }
+
+        /* Abstract Button & Content */
+        .abstract-toggle {
+            background: none;
+            border: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
             font-weight: 600;
-            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            color: var(--text-main);
+            text-decoration: underline;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .abstract-box {
+            background: var(--paper-bg);
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            margin-bottom: 20px;
+            font-size: 1rem;
+            border-radius: 4px;
+        }
+
+        .abstract-box.active {
+            padding: 30px;
+            max-height: 1000px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-pdf {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--text-main);
+            color: #fff;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
             transition: 0.2s;
         }
 
-        .cta-section a:hover {
-            border-bottom-color: var(--accent);
-        }
+        .btn-pdf:hover { background: var(--accent); transform: translateY(-2px); }
 
-        footer {
+        /* Contact Section */
+        .contact-footer {
+            margin: 100px 0;
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
             text-align: center;
-            padding: 4rem 0;
-            color: #94a3b8;
-            font-size: 0.9rem;
-            border-top: 1px solid #e2e8f0;
         }
 
-        @media (max-width: 600px) {
-            h1 { font-size: 2.6rem; }
-            .paper-header { flex-direction: column; gap: 12px; }
-            .paper-title { max-width: 100%; font-size: 1.3rem; }
-            .manifesto-box { padding: 1.5rem; }
+        .contact-footer h3 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 20px; }
+        .contact-footer a { color: var(--accent); font-weight: 600; text-decoration: none; font-size: 1.2rem; }
+
+        footer { padding: 40px 0; color: #999; font-size: 0.8rem; text-align: center; font-family: 'JetBrains Mono', monospace; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .manifesto-section { grid-template-columns: 1fr; gap: 20px; }
+            .wrapper { padding: 0 20px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="wrapper">
     <header>
-        <div class="subtitle">Journal & Repository</div>
+        <span class="logo">Human-AI Theoretical Laboratory</span>
         <h1>AI-Theoretical</h1>
     </header>
 
-    <section class="manifesto-box">
-        <h2><span>◈</span> Manifesto (Draft)</h2>
-        <div class="manifesto-text">
-            This platform collects and publishes scholarly papers openly co-authored by humans and frontier AI models. Every contribution declares transparently the role of the AI. Papers undergo review by independent AI models (different from the co-author). The goal is to experiment with new forms of knowledge production and reflect on authorship, creativity, and epistemology in the age of AI.
+    <section class="manifesto-section">
+        <div class="manifesto-label">MANIFESTO [v1.0]</div>
+        <div class="manifesto-content">
+            "This platform collects and publishes scholarly papers openly co-authored by humans and frontier AI models. We experiment with new forms of knowledge production to reflect on authorship and epistemology in the age of synthetic intelligence."
         </div>
     </section>
 
-    <section>
-        <h2 class="section-title">Founding Paper</h2>
-
-        <div class="paper-card">
-            <div class="paper-header">
-                <div class="paper-title">The Invisible Pillar: On the Genesis and Concealment of Dualism from the Pre-Socratics to the Moderns</div>
-                <div class="date-badge">December 2025</div>
-            </div>
-
-            <div class="authors">
-                <strong>Franco Cazzaniga</strong> 
-                <span style="margin: 0 10px; color: #cbd5e1;">&</span> 
-                <span class="ai-label">Claude Opus 4.5 (Anthropic)</span>
-            </div>
-
-            <button class="abstract-trigger" onclick="toggleAbstract(this)">
-                <span>＋</span> Show Abstract
-            </button>
-            
-            <div class="abstract-content" id="abstract-pillar">
-                <strong>Abstract:</strong> This paper investigates the structural persistence of dualism within Western metaphysical thought, tracing its genealogy from the fragments of the Pre-Socratics to its formal consolidation in the early modern period. It argues that the mind-body distinction functions as an "invisible pillar" that simultaneously supports and remains concealed within the framework of modern scientific rationality. By leveraging AI co-authorship, the study maps conceptual recurrences across vast philosophical corpora, offering a novel synthesis of historical analysis and computational epistemology.
-            </div>
-
-            <a href="https://ai-theoretical.org/The Invisible Pillar.pdf" class="btn-download" download>
-                📥 Download PDF (20 pages)
-            </a>
+    <main>
+        <h2 class="repository-title">Recent Papers</h2>
+        <div id="paper-list" class="paper-list">
+            <p>Loading repository...</p>
         </div>
-    </section>
+    </main>
 
-    <section class="cta-section">
-        <h3>Submit your paper</h3>
-        <p style="margin-top: 10px; color: #64748b;">Interested in contributing to this experiment?</p>
-        <p style="margin-top: 15px; font-size: 1.1rem;">Contact: <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a></p>
+    <section class="contact-footer">
+        <h3>Call for Papers</h3>
+        <p style="margin-bottom: 20px;">Submit your co-authored research to our repository.</p>
+        <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>
     </section>
 
     <footer>
-        Launching December 2025 — Work in Progress<br>
-        <strong>AI-Theoretical.org</strong>
+        &copy; 2025 AI-THEORETICAL.ORG / EST. DECEMBER 2025
     </footer>
 </div>
 
 <script>
-    function toggleAbstract(btn) {
-        const content = btn.nextElementSibling;
-        content.classList.toggle('open');
-        
-        const span = btn.querySelector('span');
-        if (content.classList.contains('open')) {
-            span.innerText = '－';
-            btn.style.background = '#e2e8f0';
-        } else {
-            span.innerText = '＋';
-            btn.style.background = '#f8fafc';
+    // Fetch papers from the auxiliary JSON file
+    async function loadPapers() {
+        try {
+            const response = await fetch('papers.json');
+            const papers = await response.json();
+            const container = document.getElementById('paper-list');
+            container.innerHTML = '';
+
+            papers.forEach(paper => {
+                const entry = document.createElement('div');
+                entry.className = 'paper-entry';
+                entry.innerHTML = `
+                    <div class="paper-meta">${paper.date} / ${paper.pages} PAGES</div>
+                    <h3 class="paper-title">${paper.title}</h3>
+                    <div class="paper-authors">
+                        <strong>${paper.authors}</strong> 
+                        <span style="font-weight:300; opacity: 0.6;">&</span> 
+                        <span style="color:var(--accent)">${paper.ai_coauthor}</span>
+                    </div>
+                    
+                    <button class="abstract-toggle" onclick="toggleAbs(this)">[ VIEW ABSTRACT ]</button>
+                    <div class="abstract-box">
+                        <strong>Abstract:</strong><br><br>
+                        ${paper.abstract}
+                    </div>
+
+                    <a href="${paper.pdf_url}" class="btn-pdf" download>DOWNLOAD PDF</a>
+                `;
+                container.appendChild(entry);
+            });
+        } catch (error) {
+            console.error('Error loading papers:', error);
+            document.getElementById('paper-list').innerHTML = '<p>Error loading papers. Ensure papers.json exists.</p>';
         }
     }
+
+    function toggleAbs(btn) {
+        const box = btn.nextElementSibling;
+        box.classList.toggle('active');
+        btn.innerText = box.classList.contains('active') ? '[ CLOSE ABSTRACT ]' : '[ VIEW ABSTRACT ]';
+    }
+
+    window.onload = loadPapers;
 </script>
 
 </body>
