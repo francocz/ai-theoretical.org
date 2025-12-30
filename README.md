@@ -1,4 +1,4 @@
-# AI-Theoretic.org
+# AI-Theoretical.org
 
 **Human–AI Co-Authored Theoretical Papers**
 
