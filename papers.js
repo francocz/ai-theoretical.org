@@ -15,13 +15,13 @@ const PAPERS_DATA = [
     },
     /* Esempio di come aggiungere il prossimo:
     {
-        id: "future-paper-02",
         title: "Titolo del prossimo saggio",
         author: "Nome Autore",
         ai_model: "GPT-5 / Gemini 2.0",
         date: "January 2026",
         pages: "15",
         file: "secondo_paper.pdf",
+        readme_url: "https://whatever.org"
         abstract: "Qui scriverai l'abstract del secondo saggio..."
     }, 
     */
