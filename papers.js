@@ -26,9 +26,7 @@ Effectiveness: Achieves aims.
 Cross-framework traction: High.
 Editorial outcome: Suitable for inclusion as a preprint.
 
-(B) EXTENDED ASSESSMENT
-[qui il giudizio esteso, 120–200 parole]
-        `,
+(B) EXTENDED ASSESSMENT The paper executes a synthetic analysis of the "intelligible-sensible" dualism, identified as an "invisible pillar" in Western thought. It identifies the Platonic inauguration of this structure and its subsequent re-articulations in hylomorphism, Neoplatonism, and medieval theology. A significant portion of the essay treats natural philosophers of the scientific revolution, such as Galileo and Newton, as philosophical investigators who transitioned the dualism from an epistemic-social distinction to a cosmological-mathematical one. The author argues that Cartesian dualism represents an interiorization of this framework rather than a radical departure. The bibliography is adequate, referencing standard scholarship to anchor these genealogical claims. The text achieves its aim of demonstrating how the framework remains embedded in modern inquiries by limiting reality to what is captureable by logos. Therefore, the essay is suitable for inclusion as a preprint.`,
 
         ai_collaboration: `
 This paper was developed through an iterative process involving an AI language model.
