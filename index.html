@@ -159,7 +159,9 @@
                 <div class="btn-group">
                     <a href="${p.pdf_file}" class="btn btn-black" download>Download PDF</a>
                     <button class="btn btn-white" onclick="toggle(${i})">View Abstract</button>
+                    ${p.ai_assessment ? `<button class="btn btn-white" onclick="toggleAssessment(${i})">AI Assessment</button>` : ``}
                 </div>
+
                 <div id="abs-${i}" class="abstract-panel">
                     <strong>Abstract:</strong><br><br>${p.abstract}
                 </div>
