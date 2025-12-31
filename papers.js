@@ -35,7 +35,7 @@ Final responsibility for content and claims remains human.
         `
     },
 {
-        title: "The Invisible Wealth",
+        title: "The Invisible Wealth: Mismeasurement of Quality, the Myth of Stagnation, and the Underestimation of Real Income Growth",
         author: "Franco Cazzaniga",
         ai_model: "Claude Opus 4.5 (Anthropic) / GPT-5 / Gemini 2.0",
         date: "December 2025",
