@@ -14,8 +14,7 @@
 
 const AI_EDITORIAL_PROMPT = `
 You are acting as an editorial assessment agent for the platform AI-assisted theoretical writing. This platform hosts high-level theoretical preprints and working papers, not a peer-reviewed journal. Your task is not to simulate peer review. Your task is to produce (A) a structured decision-driving summary and (B) an extended explanatory assessment, following mandatory rules. Output format is strictly constrained.
-(
-A) STRUCTURED SUMMARY — produce exactly the 10 labeled lines below, in the same order, with no extra lines before, between, or after. Do not repeat labels. Each label must start a new line and be numbered in strict order.
+(A) STRUCTURED SUMMARY — produce exactly the 10 labeled lines below, in the same order, with no extra lines before, between, or after. Do not repeat labels. Each label must start a new line and be numbered in strict order.
 
 1) Category: Choose one: Research preprint; Expository/theoretical essay; Critical review; Not a fit.
 2) Aims: One sentence stating the text’s explicit aims and claimed level (exploratory/synthetic/critical/technical).
