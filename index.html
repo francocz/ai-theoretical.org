@@ -3,250 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Theoretical | Human–AI Co-Authored Papers</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <title>AI-Theoretical</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0f172a;
-            --accent: #2563eb;
-            --bg: #fcfcfd;
-            --text: #334155;
-            --card-border: #e2e8f0;
+            --accent-blue: #2563eb;
+            --text-main: #1a1a1a;
+            --text-muted: #666;
+            --border: #e5e5e0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #fff; color: var(--text-main); line-height: 1.6; padding: 0 40px; }
+        .container { max-width: 1000px; margin: 0 auto; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            padding: 0 1.5rem;
+        /* HEADER (Esattamente come da screenshot) */
+        header { padding: 80px 0 40px; }
+        .top-subtitle { 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            color: var(--accent-blue); 
+            margin-bottom: 20px;
+            font-weight: 400;
         }
-
-        .container { max-width: 850px; margin: 0 auto; }
-
-        header { padding: 6rem 0 4rem; text-align: center; }
-
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.8rem;
-            color: var(--primary);
-            letter-spacing: -2px;
-            margin-bottom: 0.5rem;
+        h1 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 5rem; 
+            font-weight: 700; 
+            letter-spacing: -2px; 
+            margin-bottom: 40px;
         }
+        hr { border: 0; border-top: 1px solid var(--border); margin-bottom: 60px; }
 
-        .subtitle {
-            font-size: 1rem;
-            color: var(--accent);
+        /* MANIFESTO (Esattamente come da screenshot) */
+        .manifesto-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 60px;
+            margin-bottom: 100px;
+            align-items: start;
+        }
+        .manifesto-label {
+            font-size: 0.75rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Manifesto - Elegant & Focused */
-        .manifesto-section {
-            background: white;
-            padding: 3rem;
-            border-radius: 2px;
-            border: 1px solid var(--card-border);
-            margin-bottom: 5rem;
-            position: relative;
-        }
-
-        .manifesto-section::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--accent);
-        }
-
-        .manifesto-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .manifesto-text {
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: var(--text);
-            font-style: italic;
-        }
-
-        /* Paper List */
-        .section-label {
-            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            display: block;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 0.5rem;
+            border-top: 2px solid var(--text-main);
+            padding-top: 12px;
+            width: fit-content;
+        }
+        .manifesto-quote {
+            font-size: 1.4rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
-        .paper-card {
-            background: white;
-            padding: 2.5rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--card-border);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* PAPER SECTION (Non cambiata) */
+        .paper-entry { border-left: 1px solid var(--border); padding-left: 30px; margin-bottom: 60px; }
+        .paper-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 10px; }
+        .paper-meta { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; }
+        .ai-tag { color: var(--accent-blue); font-weight: 600; }
+        
+        .btn-group { display: flex; gap: 15px; }
+        .btn { 
+            padding: 10px 20px; font-size: 0.85rem; font-weight: 600; text-decoration: none; 
+            cursor: pointer; border: 1px solid var(--text-main); transition: 0.2s;
         }
+        .btn-black { background: var(--text-main); color: #fff; }
+        .btn-black:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .btn-white { background: #fff; color: var(--text-main); }
+        .btn-white:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 
-        .paper-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        .abstract-panel { 
+            max-height: 0; overflow: hidden; transition: 0.4s ease; 
+            background: #f9f9f9; font-size: 1rem;
         }
+        .abstract-panel.show { max-height: 800px; padding: 25px; margin: 20px 0; border: 1px solid var(--border); }
 
-        .paper-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            line-height: 1.2;
-            color: var(--primary);
-            margin-bottom: 1rem;
+        /* FOOTER & CONTACT */
+        footer {
+            margin: 100px 0 60px;
+            padding-top: 60px;
+            border-top: 1px solid var(--border);
+            text-align: center;
         }
-
-        .paper-meta {
-            font-size: 1rem;
-            margin-bottom: 2rem;
-            color: #64748b;
-        }
-
-        .paper-meta strong { color: var(--primary); font-weight: 600; }
-        .ai-tag { color: var(--accent); font-weight: 600; }
-
-        /* Buttons */
-        .actions { display: flex; gap: 1.5rem; align-items: center; }
-
-        .btn {
-            font-size: 0.9rem;
+        .participation-text { font-size: 1.1rem; margin-bottom: 30px; }
+        .participation-text a { color: var(--accent-blue); font-weight: 600; text-decoration: none; }
+        
+        .btn-readme {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 15px 30px;
+            border-radius: 4px;
+            color: var(--text-main);
             font-weight: 600;
             text-decoration: none;
-            padding: 0.7rem 1.2rem;
-            transition: 0.2s;
-            cursor: pointer;
-            border: none;
+            border: 1px solid var(--border);
         }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover { background: var(--accent); }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--card-border);
-        }
-
-        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-        /* Abstract Box */
-        .abstract-box {
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #f8fafc;
-            font-size: 1rem;
-            color: #475569;
-        }
-
-        .abstract-box.open {
-            max-height: 1000px;
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            border-top: 1px solid var(--card-border);
-        }
-
-        footer {
-            margin: 6rem 0 4rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #94a3b8;
-            border-top: 1px solid var(--card-border);
-            padding-top: 2rem;
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2.8rem; }
-            .paper-card { padding: 1.5rem; }
-            .actions { flex-direction: column; align-items: flex-start; }
-        }
+        .btn-readme:hover { background: #e5e5e5; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="subtitle">Scholarly Repository</div>
+        <div class="top-subtitle">Human-AI Theoretical Laboratory</div>
         <h1>AI-Theoretical</h1>
+        <hr>
     </header>
 
-    <section class="manifesto-section">
-        <h2 class="manifesto-title">Manifesto (Draft)</h2>
-        <p class="manifesto-text">
+    <div class="manifesto-grid">
+        <div class="manifesto-label">Manifesto [v1.0]</div>
+        <div class="manifesto-quote">
             "This platform collects and publishes scholarly papers openly co-authored by humans and frontier AI models. We experiment with new forms of knowledge production to reflect on authorship and epistemology in the age of synthetic intelligence."
-        </p>
-    </section>
-
-    <span class="section-label">Recent Publications</span>
-    
-    <div id="paper-list">
         </div>
+    </div>
+
+    <div id="repository"></div>
 
     <footer>
-        Launching December 2025 — Work in Progress<br>
-        AI-Theoretical.org | franco.cazzaniga@uninsubria.it
+        <p class="participation-text">
+            Anyone wishing to participate in the experiment is invited to contact me at: 
+            <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>
+        </p>
+        <a href="https://github.com/francocz/ai-theoretical.org" class="btn-readme">Open Project README</a>
     </footer>
 </div>
 
-<script src="database.js"></script>
-
+<script src="papers.js"></script>
 <script>
-    const listContainer = document.getElementById('paper-list');
-
-    function renderPapers() {
-        if (typeof PAPERS_REPOSITORY === 'undefined') {
-            listContainer.innerHTML = "<p>Error: database.js not found.</p>";
-            return;
-        }
-
-        listContainer.innerHTML = PAPERS_REPOSITORY.map((paper, index) => `
-            <article class="paper-card">
-                <h3 class="paper-title">${paper.title}</h3>
-                <p class="paper-meta">
-                    By <strong>${paper.author}</strong> with <span class="ai-tag">${paper.ai_model}</span>
-                    <br>
-                    Published ${paper.date} • ${paper.pages} pages
-                </p>
-                
-                <div class="actions">
-                    <a href="${paper.filename}" class="btn btn-primary" download>Download PDF</a>
-                    <button class="btn btn-outline" onclick="toggleAbstract(${index})">View Abstract</button>
+    const repo = document.getElementById('repository');
+    function render() {
+        if (typeof PAPERS_DATA === 'undefined') return;
+        repo.innerHTML = PAPERS_DATA.map((p, i) => `
+            <article class="paper-entry">
+                <h2 class="paper-title">${p.title}</h2>
+                <div class="paper-meta">
+                    By <strong>${p.author}</strong> & <span class="ai-tag">${p.ai_model}</span> | ${p.date} • ${p.pages} Pages
                 </div>
-
-                <div id="abstract-${index}" class="abstract-box">
-                    <strong>Abstract</strong><br><br>
-                    ${paper.abstract}
+                <div class="btn-group">
+                    <a href="${p.pdf_file}" class="btn btn-black" download>Download PDF</a>
+                    <button class="btn btn-white" onclick="toggle(${i})">View Abstract</button>
+                </div>
+                <div id="abs-${i}" class="abstract-panel">
+                    <strong>Abstract:</strong><br><br>${p.abstract}
                 </div>
             </article>
         `).join('');
     }
-
-    function toggleAbstract(index) {
-        const box = document.getElementById(`abstract-${index}`);
-        box.classList.toggle('open');
-    }
-
-    // Caricamento iniziale
-    window.onload = renderPapers;
+    function toggle(i) { document.getElementById(`abs-${i}`).classList.toggle('show'); }
+    window.onload = render;
 </script>
-
 </body>
 </html>
