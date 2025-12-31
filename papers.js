@@ -37,7 +37,7 @@ Final responsibility for content and claims remains human.
 {
         title: "The Invisible Wealth",
         author: "Franco Cazzaniga",
-        ai_model: "GPT-5 / Gemini 2.0",
+        ai_model: "GPT-5 / Gemini 2.0 / Claude Opus 4.5 (Anthropic)",
         date: "December 2025",
         pages: "53",
         file: "The Invisible Wealth.pdf",
