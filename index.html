@@ -17,59 +17,69 @@
         body { font-family: 'Inter', sans-serif; background: #fff; color: var(--text-main); line-height: 1.6; padding: 0 40px; }
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* HEADER (Esattamente come da screenshot) */
-        header { padding: 80px 0 40px; }
+        /* HEADER */
+        header { padding: 60px 0 30px; }
         .top-subtitle { 
-            font-size: 0.8rem; 
+            font-size: 0.7rem; 
             text-transform: uppercase; 
             letter-spacing: 4px; 
             color: var(--accent-blue); 
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 400;
         }
         h1 { 
             font-family: 'Playfair Display', serif; 
-            font-size: 5rem; 
+            font-size: 3.2rem; 
             font-weight: 700; 
-            letter-spacing: -2px; 
-            margin-bottom: 40px;
+            letter-spacing: -1.5px; 
+            margin-bottom: 30px;
         }
-        hr { border: 0; border-top: 1px solid var(--border); margin-bottom: 60px; }
+        hr { border: 0; border-top: 1px solid var(--border); margin-bottom: 50px; }
 
-        /* MANIFESTO (Esattamente come da screenshot) */
+        /* MANIFESTO */
         .manifesto-grid {
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 60px;
-            margin-bottom: 100px;
+            margin-bottom: 80px;
             align-items: start;
         }
         .manifesto-label {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             border-top: 2px solid var(--text-main);
-            padding-top: 12px;
+            padding-top: 10px;
             width: fit-content;
         }
         .manifesto-quote {
-            font-size: 1.4rem;
+            font-size: 1.15rem;
             font-weight: 300;
             font-style: italic;
             color: var(--text-muted);
             line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        .participation-call {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        .participation-call a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
         }
 
-        /* PAPER SECTION (Non cambiata) */
-        .paper-entry { border-left: 1px solid var(--border); padding-left: 30px; margin-bottom: 60px; }
-        .paper-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 10px; }
-        .paper-meta { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; }
+        /* PAPER SECTION */
+        .paper-entry { border-left: 1px solid var(--border); padding-left: 30px; margin-bottom: 50px; }
+        .paper-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 8px; }
+        .paper-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; }
         .ai-tag { color: var(--accent-blue); font-weight: 600; }
         
-        .btn-group { display: flex; gap: 15px; }
+        .btn-group { display: flex; gap: 12px; }
         .btn { 
-            padding: 10px 20px; font-size: 0.85rem; font-weight: 600; text-decoration: none; 
+            padding: 8px 16px; font-size: 0.75rem; font-weight: 600; text-decoration: none; 
             cursor: pointer; border: 1px solid var(--text-main); transition: 0.2s;
         }
         .btn-black { background: var(--text-main); color: #fff; }
@@ -79,29 +89,28 @@
 
         .abstract-panel { 
             max-height: 0; overflow: hidden; transition: 0.4s ease; 
-            background: #f9f9f9; font-size: 1rem;
+            background: #f9f9f9; font-size: 0.9rem;
         }
-        .abstract-panel.show { max-height: 800px; padding: 25px; margin: 20px 0; border: 1px solid var(--border); }
+        .abstract-panel.show { max-height: 800px; padding: 20px; margin: 15px 0; border: 1px solid var(--border); }
 
-        /* FOOTER & CONTACT */
+        /* FOOTER */
         footer {
-            margin: 100px 0 60px;
-            padding-top: 60px;
+            margin: 80px 0 60px;
+            padding-top: 40px;
             border-top: 1px solid var(--border);
             text-align: center;
         }
-        .participation-text { font-size: 1.1rem; margin-bottom: 30px; }
-        .participation-text a { color: var(--accent-blue); font-weight: 600; text-decoration: none; }
         
         .btn-readme {
             display: inline-block;
             background: #f0f0f0;
-            padding: 15px 30px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 2px;
             color: var(--text-main);
             font-weight: 600;
             text-decoration: none;
             border: 1px solid var(--border);
+            font-size: 0.8rem;
         }
         .btn-readme:hover { background: #e5e5e5; }
     </style>
@@ -117,19 +126,20 @@
 
     <div class="manifesto-grid">
         <div class="manifesto-label">Manifesto [v1.0]</div>
-        <div class="manifesto-quote">
-            "This platform collects and publishes scholarly papers openly co-authored by humans and frontier AI models. We experiment with new forms of knowledge production to reflect on authorship and epistemology in the age of synthetic intelligence."
+        <div>
+            <div class="manifesto-quote">
+                "This platform collects and publishes scholarly papers openly co-authored by humans and frontier AI models. We experiment with new forms of knowledge production to reflect on authorship and epistemology in the age of synthetic intelligence."
+            </div>
+            <div class="participation-call">
+                Interested in participating? Contact <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>
+            </div>
         </div>
     </div>
 
     <div id="repository"></div>
 
     <footer>
-        <p class="participation-text">
-            Anyone wishing to participate in the experiment is invited to contact me at: 
-            <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>
-        </p>
-        <a href="https://github.com/francocz/ai-theoretical.org" class="btn-readme">Open Project README</a>
+        <a href="README.md" target="_blank" class="btn-readme">Open README.md</a>
     </footer>
 </div>
 
