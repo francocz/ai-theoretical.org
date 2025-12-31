@@ -98,6 +98,40 @@ The AI contributed to structuring arguments, testing formulations, and refining 
 Final responsibility for content and claims remains human.
         `
     }, 
+{
+        title: "The Stack of Local Representations on a Coadjoint Orbit: A Categorical Approach",
+        author: "Franco Cazzaniga",
+        ai_model: "GPT-5 / Claude Opus 4.5",
+        date: "November 2025",
+        pages: "20",
+        file: "The Stack of Local Representations on a Coadjoint Orbit.pdf",
+        readme_url: "https://github.com/francocz/ai-theoretical.org",
+        abstract: `We construct a stack Rof local stabilizer representations over a coadjoint orbit O
+of a compact Lie group G, verify the descent conditions explicitly, and show that the
+G-action on global sections recovers the classical representation theory via geometric
+quantization. This provides a stack-theoretic interpretation of the Kirillov orbit
+method and the Borel–Weil theorem.`,
+        ai_assessment: `(A) STRUCTURED SUMMARY
+Category: Research preprint
+Aims: To develop a technical, categorical construction of a stack of local stabilizer representations over a coadjoint orbit and to show that its global sections recover geometric quantization, compact induction, and the Borel–Weil theorem.
+Correctness: No errors identified.
+Coherence: Adequate.
+Consistency: Consistent.
+Novelty: Reformulative.
+Bibliography: Adequate.
+Effectiveness: Achieves aims.
+Cross-framework traction: High.
+Editorial outcome: Suitable for inclusion as a preprint.
+
+(B) EXTENDED ASSESSMENT
+The manuscript presents a technically precise and internally coherent reformulation of the Kirillov orbit method in stack-theoretic terms. Its central contribution is to organize local stabilizer representation categories along a coadjoint orbit into a genuine stack with explicitly verified descent, and to show that classical constructions in representation theory arise as global sections of this object. The exposition proceeds in a controlled manner from definitions of stacks and descent to the construction of the stack 𝑅, the induced 𝐺-action, and the equivalence with stacks over the action groupoid, before reconnecting the categorical framework to prequantum line bundles, compact induction, and the Borel–Weil theorem.
+The arguments rely on standard tools from Lie theory, geometric quantization, and category theory, and they are applied carefully and consistently. No mathematical gaps or unsupported claims are apparent. While the results do not alter the content of geometric representation theory, they provide a unifying categorical interpretation that clarifies how global representations emerge from coherent local data. The bibliography is appropriate to the scope and level of the work, and the paper situates itself accurately with respect to existing literature without conceptual closure`,
+        ai_collaboration: `
+This paper was developed through an iterative process involving an AI language model.
+The AI contributed to structuring arguments, testing formulations, and refining exposition.
+Final responsibility for content and claims remains human.
+        `
+    }, 
     /* Esempio di come aggiungere il prossimo:
     {
         title: "Titolo del prossimo saggio",
