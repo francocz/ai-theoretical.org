@@ -165,10 +165,20 @@
                 <div id="abs-${i}" class="abstract-panel">
                     <strong>Abstract:</strong><br><br>${p.abstract}
                 </div>
+                ${p.ai_assessment ? `
+                <div id="ass-${i}" class="abstract-panel">
+                    <strong>AI Editorial Assessment:</strong><br><br>
+                    <pre style="white-space: pre-wrap; font-family: inherit;">${p.ai_assessment}</pre>
+                </div>
+                ` : ``}
+
             </article>
         `).join('');
     }
     function toggle(i) { document.getElementById(`abs-${i}`).classList.toggle('show'); }
+    function toggleAssessment(i) {
+        document.getElementById(`ass-${i}`).classList.toggle('show');
+    }
     window.onload = render;
 </script>
 </body>
