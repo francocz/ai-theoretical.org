@@ -106,7 +106,7 @@ Final responsibility for content and claims remains human.
         pages: "20",
         file: "The Stack of Local Representations on a Coadjoint Orbit.pdf",
         readme_url: "https://github.com/francocz/ai-theoretical.org",
-        abstract: `We construct a stack Rof local stabilizer representations over a coadjoint orbit O
+        abstract: `We construct a stack R of local stabilizer representations over a coadjoint orbit O
 of a compact Lie group G, verify the descent conditions explicitly, and show that the
 G-action on global sections recovers the classical representation theory via geometric
 quantization. This provides a stack-theoretic interpretation of the Kirillov orbit
