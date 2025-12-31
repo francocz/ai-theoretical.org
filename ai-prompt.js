@@ -1,7 +1,7 @@
 /**
  * AI Editorial Assessment Prompt
  * Platform: AI-Theoretical
- * Version: 1.4
+ * Version: 1.0
  * Status: Frozen
  *
  * This prompt defines the evaluation protocol used to produce
