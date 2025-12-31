@@ -66,6 +66,38 @@ The AI contributed to structuring arguments, testing formulations, and refining 
 Final responsibility for content and claims remains human.
         `
     }, 
+{
+        title: "Wave Function Collapse as Lie Algebra Contraction: The SU(2) Spin-1/2 Paradigm",
+        author: "Franco Cazzaniga",
+        ai_model: "GPT-5 / Claude Opus 4.5",
+        date: "December 2025",
+        pages: "30",
+        file: "Wave Function Collapse.pdf",
+        readme_url: "https://github.com/francocz/ai-theoretical.org",
+        abstract: `We propose a geometric mechanism for the emergence of discrete measurement outcomes in the Stern–Gerlach experiment, based on the In¨on¨u–Wigner contraction of Lie algebras. The inhomogeneous magnetic field of the apparatus explicitly breaks the internal SU(2) symmetry of the spin degree of freedom, inducing a continuous deformation of the spin algebra toward the Euclidean algebra e(2). This contraction has three consequences: (i) the spherical coadjoint orbits of SU(2) degenerate into the cylindrical orbits of E(2), geometrically encoding the loss of transverse spin structure; (ii) finite-dimensional spin representations can contract only to one-dimensional characters of E(2), providing a representation-theoretic origin for discrete outcomes; (iii) the Husimi distribution of an arbitrary spin state concentrates onto the poles of the sphere, corresponding to the eigenstates of the spin projection along the field axis.
+We derive the contraction rate from the physical parameters of the Stern–Gerlach apparatus and show that typical experimental conditions place the system deep in the contracted regime. The framework explains the discreteness of outcomes and the selection of the preferred measurement basis without invoking environmental decoherence or stochastic collapse models. It does not derive the Born rule, and whether it accounts for single-outcome realization depends on interpretive assumptions that are discussed explicitly. The approach suggests that explicit symmetry breaking may play a more general role in quantum measurement than previously recognized.`,
+        ai_assessment: `(A) STRUCTURED SUMMARY
+Category: Research preprint
+Aims: To provide a technical and conceptual account of spin measurement in the Stern–Gerlach experiment by modeling wave function collapse as a symmetry-breaking Inönü–Wigner contraction of the su(2) algebra.
+Correctness: No errors identified.
+Coherence: Adequate.
+Consistency: Consistent.
+Novelty: Original.
+Bibliography: Adequate.
+Effectiveness: Achieves aims.
+Cross-framework traction: High.
+Editorial outcome: Suitable for inclusion as a preprint.
+
+(B) EXTENDED ASSESSMENT
+The manuscript develops a mathematically explicit framework in which the discreteness and basis selection of Stern–Gerlach outcomes are explained through an Inönü–Wigner contraction of su(2) to e(2), induced by the anisotropic measurement interaction. The argument is internally coherent and proceeds systematically from Lie-algebraic foundations through coadjoint-orbit geometry, representation theory, and Husimi-state analysis. The physical interpretation is carefully constrained: the framework explicitly does not claim to derive the Born rule or resolve the single-outcome problem, and these limits are stated without equivocation.
+
+The mathematical constructions are standard but used in a non-routine way, and no formal inconsistencies or misstatements are evident. The paper maintains conceptual consistency between algebraic, geometric, and dynamical levels of description, avoiding conflation between internal symmetry space and physical space. Engagement with decoherence-based and interpretive literature is accurate and non-polemical, supporting cross-framework intelligibility rather than closure. Relative to its stated technical aims, the work is effective: it isolates and resolves the preferred-basis and discreteness components of the measurement problem within a clearly delimited theoretical scope. The manuscript meets the platform’s criteria for inclusion as a high-level theoretical preprint.`,
+        ai_collaboration: `
+This paper was developed through an iterative process involving an AI language model.
+The AI contributed to structuring arguments, testing formulations, and refining exposition.
+Final responsibility for content and claims remains human.
+        `
+    }, 
     /* Esempio di come aggiungere il prossimo:
     {
         title: "Titolo del prossimo saggio",
