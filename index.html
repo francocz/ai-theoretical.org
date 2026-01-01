@@ -62,19 +62,6 @@
             padding-top: 10px;
             width: fit-content;
         }
-        .manifesto-label a {
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-main);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .manifesto-label a:hover {
-            color: var(--accent-blue);
-        }
         .manifesto-quote {
             font-size: 1.15rem;
             font-weight: 300;
@@ -99,7 +86,7 @@
         .paper-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; }
         .ai-tag { color: var(--accent-blue); font-weight: 600; }
         
-        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-group { display: flex; gap: 12px; }
         .btn { 
             padding: 8px 16px; font-size: 0.75rem; font-weight: 600; text-decoration: none; 
             cursor: pointer; border: 1px solid var(--text-main); transition: 0.2s;
@@ -117,27 +104,24 @@
 
         /* FOOTER */
         footer {
-            margin: 80px 0 40px;
+            margin: 80px 0 60px;
             padding-top: 40px;
             border-top: 1px solid var(--border);
             text-align: center;
         }
-        footer a {
-            color: var(--accent-blue);
+        
+        .btn-readme {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 10px 20px;
+            border-radius: 2px;
+            color: var(--text-main);
+            font-weight: 600;
             text-decoration: none;
-        }
-        .powered-by {
-            margin-top: 30px;
+            border: 1px solid var(--border);
             font-size: 0.8rem;
-            color: var(--text-muted);
         }
-        .powered-by a {
-            color: var(--text-muted);
-            text-decoration: none;
-        }
-        .powered-by a:hover {
-            color: var(--accent-blue);
-        }
+        .btn-readme:hover { background: #e5e5e5; }
     </style>
 </head>
 <body>
@@ -151,11 +135,18 @@
 
     <div class="manifesto-grid">
         <div class="manifesto-label">
-            <a href="manifesto.html">Manifesto</a>
-            <a href="editorial-principles.html">Editorial framework</a>
-            <a href="ai-editorial-prompt.html">AI editorial prompt</a>
-            <a href="invite.html">Invitation to participate</a>
-            <a href="submit.html">Submit a paper</a>
+            <a href="manifesto.html" style="font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--text-main); text-decoration:none;">
+                Manifesto
+            </a><br>
+            <a href="editorial-principles.html" style="font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--text-main); text-decoration:none;">
+                Editorial framework
+            </a><br>
+            <a href="ai-editorial-prompt.html" style="font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--text-main); text-decoration:none;">
+                AI editorial prompt
+            </a><br>
+            <a href="invite.html" style="font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--text-main); text-decoration:none;">
+                Invitation to participate
+            </a>
         </div>
         <div>
             <div class="manifesto-quote">
@@ -168,9 +159,6 @@
     
     <footer>
         Interested in participating? Contact <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>
-        <div class="powered-by">
-            Powered by <a href="https://www.anthropic.com/claude" target="_blank">Claude AI</a> and <a href="https://pharo.org" target="_blank">Pharo Smalltalk</a>
-        </div>
     </footer>
 </div>
 
@@ -187,9 +175,8 @@
                 </div>
                 <div class="btn-group">
                     <a href="${p.pdf_file}" class="btn btn-black" download>Download PDF</a>
-                    <button class="btn btn-white" onclick="toggle('abs-${i}')">Abstract</button>
-                    ${p.ai_assessment ? `<button class="btn btn-white" onclick="toggle('ass-${i}')">AI Assessment</button>` : ``}
-                    ${p.notes ? `<button class="btn btn-white" onclick="toggle('notes-${i}')">Notes</button>` : ``}
+                    <button class="btn btn-white" onclick="toggle(${i})">View Abstract</button>
+                    ${p.ai_assessment ? `<button class="btn btn-white" onclick="toggleAssessment(${i})">AI Assessment</button>` : ``}
                 </div>
 
                 <div id="abs-${i}" class="abstract-panel">
@@ -201,17 +188,13 @@
                     <pre style="white-space: pre-wrap; font-family: inherit;">${p.ai_assessment}</pre>
                 </div>
                 ` : ``}
-                ${p.notes ? `
-                <div id="notes-${i}" class="abstract-panel">
-                    <strong>Notes on AI Collaboration:</strong><br><br>
-                    <pre style="white-space: pre-wrap; font-family: inherit;">${p.notes}</pre>
-                </div>
-                ` : ``}
+
             </article>
         `).join('');
     }
-    function toggle(id) { 
-        document.getElementById(id).classList.toggle('show'); 
+    function toggle(i) { document.getElementById(`abs-${i}`).classList.toggle('show'); }
+    function toggleAssessment(i) {
+        document.getElementById(`ass-${i}`).classList.toggle('show');
     }
     window.onload = render;
 </script>
