@@ -15,19 +15,19 @@ const PAPERS_DATA = [
         ,
         ai_assessment: `
 (A) STRUCTURED SUMMARY
-Category: Expository / theoretical essay
-Aims: Synthetic and critical reconstruction of the Platonic dualist framework.
-Correctness: No errors identified.
-Coherence: Adequate.
-Consistency: Consistent.
-Novelty: Reformulative.
-Bibliography: Adequate.
-Effectiveness: Achieves aims.
-Cross-framework traction: High.
-Editorial outcome: Suitable for inclusion as a preprint.
-
-(B) EXTENDED ASSESSMENT The paper executes a synthetic analysis of the "intelligible-sensible" dualism, identified as an "invisible pillar" in Western thought. It identifies the Platonic inauguration of this structure and its subsequent re-articulations in hylomorphism, Neoplatonism, and medieval theology. A significant portion of the essay treats natural philosophers of the scientific revolution, such as Galileo and Newton, as philosophical investigators who transitioned the dualism from an epistemic-social distinction to a cosmological-mathematical one. The author argues that Cartesian dualism represents an interiorization of this framework rather than a radical departure. The bibliography is adequate, referencing standard scholarship to anchor these genealogical claims. The text achieves its aim of demonstrating how the framework remains embedded in modern inquiries by limiting reality to what is captureable by logos. Therefore, the essay is suitable for inclusion as a preprint.`,
-
+Category: Expository/theoretical essay. 
+Aims: The text aims to trace the genealogy of dualism from its pre-Socratic background through its Platonic inauguration to its modern transformations to expose it as an assimilated historical structure at a synthetic level.
+Correctness: No errors identified
+Coherence: Adequate
+Consistency: Consistent
+Semantic opacity: Low (Transparent)
+Novelty: Consolidative
+Bibliography: Adequate
+Effectiveness: Achieves aims
+Cross-framework traction: High
+Editorial outcome: Suitable for inclusion as a preprint
+(B) EXTENDED ASSESSMENT The text provides a synthetic genealogy of dualism, beginning with the pre-Socratic focus on "ta onta". It argues that Plato introduced a structural division between the intelligible and sensible that subsequent philosophy has largely naturalized as an "invisible pillar". The assessment identifies the work as an expository/theoretical essay that achieves its aims by clearly articulating how this framework transitioned from an epistemic social distinction in antiquity to a cosmological and metaphysical one in the modern era. The coherence is adequate, following a logical chronological progression from Greek thought through the scientific revolution of Copernicus, Kepler, Galileo, and Newton .
+The bibliography is adequate, supporting the synthetic claims with a wide range of primary texts and recognized secondary scholarship . Because the text maintains high transparency and internal consistency while demonstrating significant cross-framework traction between history, science, and metaphysics, it is judged to be suitable for inclusion as a preprint. The paper effectively consolidates existing historical narratives into a singular critical framework without introducing undermining errors or major drifts.`,
         ai_collaboration: `
 This paper was developed through an iterative process involving an AI language model.
 The AI contributed to structuring arguments, testing formulations, and refining exposition.
