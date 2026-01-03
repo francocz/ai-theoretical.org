@@ -74,6 +74,15 @@ footer {
     text-align: center;
 }
 
+footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--accent-blue);
+}
+
 /* HEADER */
 header { padding: 60px 0 30px; }
 .top-subtitle { 
@@ -412,31 +421,4 @@ footer a {
 
     window.onload = init;
 </script></body>
-</html>: pre-wrap; font-family: inherit;">${p.notes}</pre>
-                </div>
-                ` : ``}
-            </article>
-        `}).join('');
-    }
-
-    function toggle(id) { 
-        document.getElementById(id).classList.toggle('show'); 
-    }
-
-    function init() {
-        if (typeof PAPERS_DATA === 'undefined') return;
-        allPapers = PAPERS_DATA;
-        populateFilters();
-        renderPapers(allPapers);
-        updateStatus(allPapers.length, allPapers.length);
-
-        searchInput.addEventListener('input', filterPapers);
-        yearFilter.addEventListener('change', filterPapers);
-        authorFilter.addEventListener('change', filterPapers);
-        aiFilter.addEventListener('change', filterPapers);
-    }
-
-    window.onload = init;
-</script>
-</body>
 </html>

@@ -74,6 +74,15 @@ footer {
     text-align: center;
 }
 
+footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--accent-blue);
+}
+
 /* FORM STYLES */
 form {
     max-width: 720px;
@@ -374,39 +383,4 @@ button[type="submit"]:disabled {
         }
     });
 </script></body>
-</html>mitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            try {
-                const formData = new FormData(form);
-                
-                // Convert checkbox to string
-                formData.set('acceptTerms', document.getElementById('acceptTerms').checked ? 'true' : 'false');
-                
-                const response = await fetch('/api/submit', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
-                    successMessage.classList.remove('hidden');
-                    form.reset();
-                    form.classList.add('hidden');
-                    window.scrollTo(0, 0);
-                } else {
-                    throw new Error(result.error || 'Submission failed');
-                }
-                
-            } catch (error) {
-                errorMessage.textContent = 'Error: ' + error.message;
-                errorMessage.classList.remove('hidden');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Paper';
-            }
-        });
-    </script>
-</body>
 </html>

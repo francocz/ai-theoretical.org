@@ -70,6 +70,15 @@ footer {
     text-align: center;
 }
 
+footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--accent-blue);
+}
+
 .prompt-frame {
     border: 1px solid var(--border);
     padding: 30px;
@@ -141,25 +150,4 @@ footer {
         version.textContent = 'Prompt version unknown';
     }
 </script></body>
-</html>>
-
-<script src="ai-prompt.js"></script>
-<script>
-    const content = document.getElementById('prompt-content');
-    const version = document.getElementById('prompt-version');
-
-    if (typeof AI_EDITORIAL_PROMPT !== 'undefined') {
-        content.textContent = AI_EDITORIAL_PROMPT.trim();
-    } else {
-        content.textContent = 'Prompt not available.';
-    }
-
-    if (typeof Version !== 'undefined') {
-        version.textContent = `Prompt version ${Version}`;
-    } else {
-        version.textContent = 'Prompt version unknown';
-    }
-</script>
-
-</body>
 </html>
