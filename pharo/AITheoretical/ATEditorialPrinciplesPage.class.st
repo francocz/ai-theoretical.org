@@ -1,92 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editorial Framework — AI-Theoretical</title>
-    <meta name="description" content="The protocol for AI-assisted editorial assessment. Learn about our criteria for theoretical adequacy, coherence, and scholarly grounding.">
-    <meta property="og:title" content="Editorial Framework — AI-Theoretical">
-    <meta property="og:description" content="How we evaluate human-AI co-authored papers.">
-    <meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <style>
-:root {
-    --accent-blue: #2563eb;
-    --text-main: #1a1a1a;
-    --text-muted: #666;
-    --border: #e5e5e0;
+Class {
+	#name : 'ATEditorialPrinciplesPage',
+	#superclass : 'ATStaticPage',
+	#category : 'AITheoretical',
+	#package : 'AITheoretical'
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: 'Inter', sans-serif;
-    background: #fff;
-    color: var(--text-main);
-    line-height: 1.6;
-    padding: 0 40px;
-}
-.container {
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-header {
-    padding: 60px 0 30px;
-}
-
-.nav {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-decoration: none;
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.4rem;
-    font-weight: 700;
-    letter-spacing: -1px;
-    margin-bottom: 20px;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-    margin-bottom: 40px;
-}
-
-.section {
-    max-width: 720px;
-    font-size: 0.95rem;
-    margin-bottom: 30px;
-}
-
-footer {
-    margin: 80px 0 60px;
-    padding-top: 40px;
-    border-top: 1px solid var(--border);
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    text-align: center;
-}
-
-.section h2 {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-}
-
-.section p {
-    font-size: 0.95rem;
-    margin-bottom: 14px;
-    color: var(--text-main);
-}    </style>
-</head>
-<body>
-<div class="container">
+{ #category : 'generating' }
+ATEditorialPrinciplesPage >> content [
+	^ '<div class="container">
 
 <header>
     <a href="index.html" class="nav">← Back</a>
@@ -145,7 +66,7 @@ footer {
     </p>
     <p>
         The assessment does not certify correctness, originality, or importance in an academic sense.
-        Its function is to evaluate formal and conceptual adequacy relative to the text's declared aims,
+        Its function is to evaluate formal and conceptual adequacy relative to the text''s declared aims,
         including coherence, consistency, scholarly grounding, and cognitive traction beyond a single
         theoretical canon.
     </p>
@@ -171,14 +92,58 @@ footer {
     </p>
 </div>
 
-<footer>
-    <p class="powered-by">Powered by <a href="https://www.anthropic.com/claude" target="_blank">Claude AI</a> and <a href="https://pharo.org" target="_blank">Pharo Smalltalk</a></p>
-</footer>
+', self footer, '
 
-</div></body>
-</html>class="powered-by">Powered by <a href="https://www.anthropic.com/claude" target="_blank">Claude AI</a> and <a href="https://pharo.org" target="_blank">Pharo Smalltalk</a></p>
-    </footer>
+</div>'
+]
 
-</div>
-</body>
-</html>
+{ #category : 'generating' }
+ATEditorialPrinciplesPage >> css [
+	^ super css, String lf, '
+.section h2 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.section p {
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    color: var(--text-main);
+}'
+]
+
+{ #category : 'accessing' }
+ATEditorialPrinciplesPage >> description [
+	^ 'The protocol for AI-assisted editorial assessment. Learn about our criteria for theoretical adequacy, coherence, and scholarly grounding.'
+]
+
+{ #category : 'accessing' }
+ATEditorialPrinciplesPage >> fileName [
+	^ 'editorial-principles.html'
+]
+
+{ #category : 'generating' }
+ATEditorialPrinciplesPage >> head [
+	^ String streamContents: [ :s |
+		s << '<head>'; << String lf.
+		s << '    <meta charset="UTF-8">'; << String lf.
+		s << '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'; << String lf.
+		s << '    <title>'; << self title; << '</title>'; << String lf.
+		s << '    <meta name="description" content="'; << self description; << '">'; << String lf.
+		s << '    <meta property="og:title" content="'; << self title; << '">'; << String lf.
+		s << '    <meta property="og:description" content="How we evaluate human-AI co-authored papers.">'; << String lf.
+		s << '    <meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; << String lf.
+		s << self fonts.
+		s << '    <style>'; << String lf.
+		s << self css.
+		s << '    </style>'; << String lf.
+		s << '</head>'; << String lf ]
+]
+
+{ #category : 'accessing' }
+ATEditorialPrinciplesPage >> title [
+	^ 'Editorial Framework — AI-Theoretical'
+]
