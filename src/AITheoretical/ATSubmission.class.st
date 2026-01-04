@@ -17,7 +17,10 @@ Class {
 		'notes',
 		'paperToken',
 		'codeZipKey',
-		'hasCode'
+		'hasCode',
+		'track',
+		'isTest',
+		'promptVersion'
 	],
 	#category : 'AITheoretical',
 	#package : 'AITheoretical'
@@ -25,25 +28,27 @@ Class {
 
 { #category : 'instance creation' }
 ATSubmission class >> fromDictionary: aDict [
-	| submission statusStr |
-	submission := self new
-		id: (aDict at: 'id' ifAbsent: [ nil ]);
-		paperToken: (aDict at: 'paperToken' ifAbsent: [ nil ]);
-		authorName: (aDict at: 'authorName' ifAbsent: [ '' ]);
-		authorEmail: (aDict at: 'authorEmail' ifAbsent: [ '' ]);
-		authorAffiliation: (aDict at: 'authorAffiliation' ifAbsent: [ nil ]);
-		title: (aDict at: 'title' ifAbsent: [ '' ]);
-		abstract: (aDict at: 'abstract' ifAbsent: [ '' ]);
-		aiModels: (aDict at: 'aiModels' ifAbsent: [ '' ]);
-		notes: (aDict at: 'notes' ifAbsent: [ '' ]);
-		pdfKey: (aDict at: 'pdfKey' ifAbsent: [ nil ]);
-		hasPdf: (aDict at: 'hasPdf' ifAbsent: [ false ]);
-		codeZipKey: (aDict at: 'codeZipKey' ifAbsent: [ nil ]);
-		hasCode: (aDict at: 'hasCode' ifAbsent: [ false ]);
-		yourself.
-	statusStr := aDict at: 'status' ifAbsent: [ 'pending' ].
-	submission status: statusStr asSymbol.
-	^ submission
+    | submission statusStr trackStr |
+    submission := self new
+        id: (aDict at: 'id' ifAbsent: [ nil ]);
+        paperToken: (aDict at: 'paperToken' ifAbsent: [ nil ]);
+        authorName: (aDict at: 'authorName' ifAbsent: [ '' ]);
+        authorEmail: (aDict at: 'authorEmail' ifAbsent: [ '' ]);
+        authorAffiliation: (aDict at: 'authorAffiliation' ifAbsent: [ nil ]);
+        title: (aDict at: 'title' ifAbsent: [ '' ]);
+        abstract: (aDict at: 'abstract' ifAbsent: [ '' ]);
+        aiModels: (aDict at: 'aiModels' ifAbsent: [ '' ]);
+        notes: (aDict at: 'notes' ifAbsent: [ '' ]);
+        pdfKey: (aDict at: 'pdfKey' ifAbsent: [ nil ]);
+        hasPdf: (aDict at: 'hasPdf' ifAbsent: [ false ]);
+        codeZipKey: (aDict at: 'codeZipKey' ifAbsent: [ nil ]);
+        hasCode: (aDict at: 'hasCode' ifAbsent: [ false ]);
+        yourself.
+    statusStr := aDict at: 'status' ifAbsent: [ 'pending' ].
+    submission status: statusStr asSymbol.
+    trackStr := aDict at: 'track' ifAbsent: [ 'workingPaper' ].
+    submission track: trackStr asSymbol.
+    ^ submission
 ]
 
 { #category : 'accessing' }
@@ -90,18 +95,19 @@ ATSubmission >> asDictionary [
 
 { #category : 'converting' }
 ATSubmission >> asPaper [
-"Crea un ATPaper da questa submission. Usare solo dopo accettazione."
-| paper |
-paper := (Smalltalk globals at: #ATPaper) new
-    title: title;
-    authors: authorName;
-    aiModels: aiModels;
-    abstract: abstract;
-    generateSlug;
-    yourself.
-authorAffiliation ifNotNil: [ :aff |
-    paper authors: (authorName, ' (', aff, ')') ].
-^ paper
+    "Crea un ATPaper da questa submission. Usare solo dopo accettazione."
+    | paper |
+    paper := ATPaper new
+        title: title;
+        authors: authorName;
+        aiModels: aiModels;
+        abstract: abstract;
+        track: self track;
+        generateSlug;
+        yourself.
+    authorAffiliation ifNotNil: [ :aff |
+        paper authors: (authorName, ' (', aff, ')') ].
+    ^ paper
 ]
 
 { #category : 'accessing' }
@@ -143,6 +149,30 @@ ATSubmission >> codeZipKey [
 ATSubmission >> codeZipKey: aKey [
 	codeZipKey := aKey.
 	hasCode := aKey notNil and: [ aKey notEmpty ]
+]
+
+{ #category : 'actions' }
+ATSubmission >> delete [
+	"Elimina questa submission via API e dalla cache locale"
+	| response |
+	
+	"Elimina via API"
+	response := ZnClient new
+		url: 'https://ai-theoretical.org/api/submission/', id;
+		headerAt: 'Authorization' put: 'Bearer ', ATRepository current apiToken;
+		delete;
+		response.
+	
+	response isSuccess ifFalse: [
+		self error: 'Failed to delete submission: ', response statusLine asString ].
+	
+	"Rimuovi dalla cache locale"
+	ATRepository current submissions remove: self ifAbsent: [].
+	
+	"Rimuovi da pendingApprovals se presente"
+	ATAutomation current pendingApprovals removeAllSuchThat: [ :a | a submission id = id ].
+	
+	^ self
 ]
 
 { #category : 'accessing' }
@@ -198,6 +228,18 @@ ATSubmission >> isRejected [
 ^ status = #rejected
 ]
 
+{ #category : 'testing' }
+ATSubmission >> isTest [ ^ isTest ifNil: [ false ]
+]
+
+{ #category : 'testing' }
+ATSubmission >> isTest: aBoolean [ isTest := aBoolean
+]
+
+{ #category : 'testing' }
+ATSubmission >> markAsTest [ isTest := true
+]
+
 { #category : 'accessing' }
 ATSubmission >> notes [
     ^ notes
@@ -238,6 +280,14 @@ ATSubmission >> pdfUrl: anObject [
 pdfUrl := anObject
 ]
 
+{ #category : 'accessing' }
+ATSubmission >> promptVersion [ ^ promptVersion
+]
+
+{ #category : 'accessing' }
+ATSubmission >> promptVersion: aString [ promptVersion := aString
+]
+
 { #category : 'actions' }
 ATSubmission >> reject [
 status := #rejected
@@ -271,4 +321,12 @@ ATSubmission >> title [
 { #category : 'accessing' }
 ATSubmission >> title: anObject [
 title := anObject
+]
+
+{ #category : 'accessing' }
+ATSubmission >> track [ ^ track ifNil: [ #workingPaper ]
+]
+
+{ #category : 'accessing' }
+ATSubmission >> track: aSymbol [ track := aSymbol
 ]

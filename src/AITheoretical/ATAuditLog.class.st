@@ -22,6 +22,18 @@ ATAuditLog class >> reset [
 	Current := nil
 ]
 
+{ #category : 'private' }
+ATAuditLog >> appendEntry: aDictionary toFile: aFilePath [
+    | json |
+    json := NeoJSONWriter toString: aDictionary.
+    aFilePath asFileReference 
+        ensureCreateFile;
+        writeStreamDo: [ :s | 
+            s setToEnd.
+            s nextPutAll: json.
+            s nextPut: Character lf ]
+]
+
 { #category : 'querying' }
 ATAuditLog >> assessments [
 	^ self entriesOfType: 'assessment'
@@ -132,6 +144,23 @@ ATAuditLog >> logFile [
 { #category : 'accessing' }
 ATAuditLog >> logFile: aPath [
 	logFile := aPath
+]
+
+{ #category : 'logging' }
+ATAuditLog >> logTestAssessment: aSubmission verdict: aVerdict assessment: anAssessment [
+    "Log per test - file separato"
+    | entry testLogPath |
+    entry := Dictionary new
+        at: 'timestamp' put: DateAndTime now asString;
+        at: 'type' put: 'TEST_ASSESSMENT';
+        at: 'submissionId' put: aSubmission id;
+        at: 'title' put: aSubmission title;
+        at: 'verdict' put: aVerdict;
+        at: 'assessment' put: (anAssessment first: (200 min: anAssessment size));
+        yourself.
+    
+    testLogPath := logFilePath asFileReference parent / 'audit_test.log'.
+    self appendEntry: entry toFile: testLogPath fullName
 ]
 
 { #category : 'querying' }

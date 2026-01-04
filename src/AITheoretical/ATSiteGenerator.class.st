@@ -45,8 +45,8 @@ ATSiteGenerator >> defaultStaticPages [
     ^ OrderedCollection withAll: #(
         'index.html'
         'manifesto.html'
-        'editorial-principles.html'
-        'ai-editorial-prompt.html'
+        'editorial-framework.html'
+        'ai-editorial-prompts.html'
         'invite.html'
         'submit.html'
     )

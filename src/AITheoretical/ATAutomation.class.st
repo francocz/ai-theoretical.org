@@ -8,7 +8,9 @@ Class {
 		'lastCheck',
 		'emailSender',
 		'mode',
-		'pendingApprovals'
+		'pendingApprovals',
+		'processedIds',
+		'operatingMode'
 	],
 	#classVars : [
 		'Current'
@@ -57,14 +59,15 @@ ATAutomation >> approveAllPending [
 	toApprove do: [ :p | self approvePending: p ]
 ]
 
-{ #category : 'manual' }
+{ #category : 'actions' }
 ATAutomation >> approvePending: aPendingApproval [
 	"Approva manualmente una pending approval"
 	| result |
 	result := self executeDecision: #accept
 		forSubmission: aPendingApproval submission
 		withAssessment: aPendingApproval assessment.
-	self pendingApprovals remove: aPendingApproval ifAbsent: [].
+	pendingApprovals remove: aPendingApproval ifAbsent: [].
+	processedIds remove: aPendingApproval submission id ifAbsent: [].
 	^ result
 ]
 
@@ -90,6 +93,34 @@ ATAutomation >> checkAndProcess [
 		(self processSubmission: sub) = #accepted ifTrue: [ accepted := true ] ].
 	accepted ifTrue: [ ATRepository current deploy ].
 	lastCheck := DateAndTime now
+]
+
+{ #category : 'test cleanup' }
+ATAutomation >> deleteAllTestData [
+    "Elimina tutte le submission e paper di test"
+    | testSubmissions testPapers testLogPath |
+    
+    "Rimuovi submission di test"
+    testSubmissions := ATRepository current submissions select: [ :s | s isTest ].
+    testSubmissions do: [ :s | ATRepository current submissions remove: s ifAbsent: [] ].
+    
+    "Rimuovi paper di test"
+    testPapers := ATRepository current papers select: [ :p | p isTest ].
+    testPapers do: [ :p | ATRepository current papers remove: p ifAbsent: [] ].
+    
+    "Rimuovi pending approvals di test"
+    pendingApprovals removeAllSuchThat: [ :pa | pa submission isTest ].
+    
+    "Rimuovi rejected di test"
+    ATRejectedRepository current rejectedSubmissions 
+        removeAllSuchThat: [ :r | r id beginsWith: 'test-' ].
+    
+    "Svuota log di test"
+    testLogPath := ATAuditLog current logFilePath asFileReference parent / 'audit_test.log'.
+    testLogPath exists ifTrue: [ testLogPath delete ].
+    
+    ^ 'Deleted: ', testSubmissions size asString, ' submissions, ', 
+      testPapers size asString, ' papers, test log cleared'
 ]
 
 { #category : 'accessing' }
@@ -139,15 +170,27 @@ ATAutomation >> fullAuto [
 { #category : 'initialization' }
 ATAutomation >> initialize [
 	super initialize.
-	pollingInterval := 60.
-	lastCheck := DateAndTime now.
-	mode := #fullAuto.
-	pendingApprovals := OrderedCollection new
+	mode := #semiAuto.
+	pendingApprovals := OrderedCollection new.
+	processedIds := Set new.
+	isRunning := false
+]
+
+{ #category : 'testing' }
+ATAutomation >> isProduction [ ^ self operatingMode = #production
 ]
 
 { #category : 'testing' }
 ATAutomation >> isRunning [
 	^ pollingProcess notNil and: [ pollingProcess isTerminated not ]
+]
+
+{ #category : 'testing' }
+ATAutomation >> isSimulatedMode [ ^ self operatingMode = #testSimulatedAI
+]
+
+{ #category : 'testing' }
+ATAutomation >> isTestMode [ ^ self operatingMode ~= #production
 ]
 
 { #category : 'accessing' }
@@ -190,6 +233,17 @@ ATAutomation >> mode: aSymbol [
 	mode := aSymbol
 ]
 
+{ #category : 'accessing' }
+ATAutomation >> operatingMode [ 
+    ^ operatingMode ifNil: [ #production ]
+]
+
+{ #category : 'accessing' }
+ATAutomation >> operatingMode: aSymbol [ 
+    "Modes: #production, #testLiveAI, #testSimulatedAI"
+    operatingMode := aSymbol
+]
+
 { #category : 'parsing' }
 ATAutomation >> parseVerdict: assessmentText [
 	"Estrae il verdict dall'assessment. Ritorna #accept, #reject o #review"
@@ -214,48 +268,87 @@ ATAutomation >> pollingInterval: seconds [
 
 { #category : 'processing' }
 ATAutomation >> processSubmission: aSubmission [
-	"Processa una submission: genera assessment, decide in base alla modalità"
-	| assessment verdict config |
-	assessmentGenerator ifNil: [ ^ self error: 'No assessment generator configured' ].
-	
-	"Genera assessment"
-	[ assessment := assessmentGenerator assessSubmission: aSubmission ]
-		on: Error
-		do: [ :e | 
-			ATAuditLog current logError: e messageText forSubmission: aSubmission.
-			^ #error ].
-	
-	verdict := self parseVerdict: assessment.
-	config := assessmentGenerator configurationDictionary.
-	
-	"Log dell'assessment"
-	ATAuditLog current 
-		logAssessment: aSubmission 
-		verdict: verdict 
-		assessment: assessment 
-		config: config.
-	
-	"In semiAuto, aggiungi a pending e aspetta approvazione"
-	mode = #semiAuto ifTrue: [
-		self pendingApprovals add: (ATPendingApproval
-			submission: aSubmission
-			assessment: assessment
-			verdict: verdict).
-		^ #pendingApproval ].
-	
-	"In fullAuto, processa immediatamente"
-	^ self executeDecision: verdict forSubmission: aSubmission withAssessment: assessment
+    "Processa una submission: genera assessment, decide in base alla modalità"
+    | assessment verdict config prompt |
+    
+    "Già processata?"
+    (processedIds includes: aSubmission id) ifTrue: [ ^ #alreadyProcessed ].
+    
+    "In test mode, marca la submission"
+    self isTestMode ifTrue: [ aSubmission markAsTest ].
+    
+    "Genera assessment - simulato o reale"
+    self isSimulatedMode ifTrue: [
+        "Usa assessment simulato"
+        assessment := self simulatedAssessmentForVerdict: #review.
+        aSubmission promptVersion: 'simulated'.
+    ] ifFalse: [
+        "Usa AI reale"
+        assessmentGenerator ifNil: [ ^ self error: 'No assessment generator configured' ].
+        
+        "Ottieni prompt dal registry"
+        prompt := ATPromptRegistry current activePromptForTrack: aSubmission track.
+        prompt ifNotNil: [
+            assessmentGenerator editorialPrompt: prompt content.
+            aSubmission promptVersion: aSubmission track asString, ' v', prompt version ].
+        
+        [ assessment := assessmentGenerator assessSubmission: aSubmission ]
+            on: Error
+            do: [ :e | 
+                ATAuditLog current logError: e messageText forSubmission: aSubmission.
+                ^ #error ].
+        
+        "Se assessment vuoto, non procedere"
+        (assessment isNil or: [ assessment isEmpty ]) ifTrue: [
+            ATAuditLog current logError: 'Empty assessment received' forSubmission: aSubmission.
+            ^ #emptyAssessment ] ].
+    
+    verdict := self parseVerdict: assessment.
+    config := assessmentGenerator 
+        ifNotNil: [ assessmentGenerator configurationDictionary ]
+        ifNil: [ Dictionary new at: 'mode' put: 'simulated'; yourself ].
+    
+    "Log - usa log separato per test"
+    self isTestMode 
+        ifTrue: [ ATAuditLog current logTestAssessment: aSubmission verdict: verdict assessment: assessment ]
+        ifFalse: [ ATAuditLog current logAssessment: aSubmission verdict: verdict assessment: assessment config: config ].
+    
+    "Marca come processata"
+    processedIds add: aSubmission id.
+    
+    "In semiAuto, aggiungi a pending e aspetta approvazione"
+    mode = #semiAuto ifTrue: [
+        pendingApprovals add: (ATPendingApproval
+            submission: aSubmission
+            assessment: assessment
+            verdict: verdict).
+        ^ #pendingApproval ].
+    
+    "In fullAuto, processa immediatamente"
+    ^ self executeDecision: verdict forSubmission: aSubmission withAssessment: assessment
 ]
 
-{ #category : 'manual' }
+{ #category : 'manual actions' }
 ATAutomation >> rejectPending: aPendingApproval [
-	"Rifiuta manualmente una pending approval"
-	| result |
-	result := self executeDecision: #reject
-		forSubmission: aPendingApproval submission
-		withAssessment: aPendingApproval assessment.
-	self pendingApprovals remove: aPendingApproval ifAbsent: [].
-	^ result
+    "Rifiuta manualmente una pending approval, archivia con PDF"
+    | result rejected pdfPath |
+    
+    "Scarica PDF prima di tutto"
+    pdfPath := ATRejectedRepository current 
+        downloadPdf: aPendingApproval submission id.
+    
+    "Archivia"
+    rejected := ATRejectedSubmission fromPendingApproval: aPendingApproval.
+    rejected localPdfPath: pdfPath.
+    ATRejectedRepository current add: rejected.
+    
+    "Esegui rejection"
+    result := self executeDecision: #reject
+        forSubmission: aPendingApproval submission
+        withAssessment: aPendingApproval assessment.
+    pendingApprovals remove: aPendingApproval ifAbsent: [].
+    processedIds remove: aPendingApproval submission id ifAbsent: [].
+    ^ result
 ]
 
 { #category : 'configuration' }
@@ -276,6 +369,69 @@ ATAutomation >> saveConfiguration [
 { #category : 'configuration' }
 ATAutomation >> semiAuto [
 	mode := #semiAuto
+]
+
+{ #category : 'simulation' }
+ATAutomation >> simulatedAssessmentForVerdict: aVerdict [
+    "Ritorna un assessment simulato per testing"
+    | lf |
+    lf := String lf.
+    aVerdict = #accept ifTrue: [
+        ^ '1) Category: Research preprint', lf,
+          '2) Aims: Test submission aims', lf,
+          '3) Correctness: No errors identified', lf,
+          '4) Coherence: Adequate', lf,
+          '5) Consistency: Consistent', lf,
+          '6) Semantic opacity: Low (Transparent)', lf,
+          '7) Novelty: Original', lf,
+          '8) Bibliography: Adequate', lf,
+          '9) Effectiveness: Achieves aims', lf,
+          '10) Cross-framework traction: High', lf,
+          '11) Claims: Supported', lf,
+          '12) Contribution: Substantive', lf,
+          '13) Structure: Adequate', lf,
+          '14) Integrity: No issues', lf,
+          '15) Code: Not provided', lf,
+          '16) Editorial outcome: Suitable for inclusion', lf, lf,
+          '[SIMULATED] This is a test assessment for acceptance flow testing.' ].
+    
+    aVerdict = #reject ifTrue: [
+        ^ '1) Category: Not a fit', lf,
+          '2) Aims: Unclear aims', lf,
+          '3) Correctness: Undermining errors', lf,
+          '4) Coherence: Major issues', lf,
+          '5) Consistency: Major drift', lf,
+          '6) Semantic opacity: High (Obfuscatory)', lf,
+          '7) Novelty: Consolidative', lf,
+          '8) Bibliography: Absent', lf,
+          '9) Effectiveness: Fails to achieve aims', lf,
+          '10) Cross-framework traction: Low', lf,
+          '11) Claims: Unsupported assertions', lf,
+          '12) Contribution: Absent', lf,
+          '13) Structure: Inadequate', lf,
+          '14) Integrity: No issues', lf,
+          '15) Code: Not provided', lf,
+          '16) Editorial outcome: Not suitable for this platform', lf, lf,
+          '[SIMULATED] This is a test assessment for rejection flow testing.' ].
+    
+    "Default: review"
+    ^ '1) Category: Research preprint', lf,
+      '2) Aims: Test aims', lf,
+      '3) Correctness: Minor local issues', lf,
+      '4) Coherence: Minor issues', lf,
+      '5) Consistency: Consistent', lf,
+      '6) Semantic opacity: Moderate', lf,
+      '7) Novelty: Reformulative', lf,
+      '8) Bibliography: Incomplete', lf,
+      '9) Effectiveness: Partially achieves aims', lf,
+      '10) Cross-framework traction: Medium', lf,
+      '11) Claims: Partially supported', lf,
+      '12) Contribution: Marginal', lf,
+      '13) Structure: Minor issues', lf,
+      '14) Integrity: No issues', lf,
+      '15) Code: Not provided', lf,
+      '16) Editorial outcome: Potentially suitable with revision', lf, lf,
+      '[SIMULATED] This is a test assessment for revision flow testing.'
 ]
 
 { #category : 'control' }

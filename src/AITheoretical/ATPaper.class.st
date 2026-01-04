@@ -17,7 +17,9 @@ Class {
 		'status',
 		'withdrawalReason',
 		'submissionId',
-		'assessmentPromptVersion'
+		'assessmentPromptVersion',
+		'track',
+		'isTest'
 	],
 	#category : 'AITheoretical',
 	#package : 'AITheoretical'
@@ -25,32 +27,35 @@ Class {
 
 { #category : 'instance creation' }
 ATPaper class >> fromDictionary: aDict [
-	"Crea un ATPaper da un dizionario"
-	| paper statusStr |
-	paper := self new
-		title: (aDict at: 'title' ifAbsent: [ '' ]);
-		authors: (aDict at: 'author' ifAbsent: [ '' ]);
-		aiModels: (aDict at: 'ai_model' ifAbsent: [ '' ]);
-		date: (aDict at: 'date' ifAbsent: [ '' ]);
-		pages: (aDict at: 'pages' ifAbsent: [ '' ]);
-		pdfFile: (aDict at: 'pdf_file' ifAbsent: [ '' ]);
-		abstract: (aDict at: 'abstract' ifAbsent: [ '' ]);
-		aiAssessment: (aDict at: 'ai_assessment' ifAbsent: [ '' ]);
-		aiCollaboration: (aDict at: 'ai_collaboration' ifAbsent: [ '' ]);
-		notes: (aDict at: 'notes' ifAbsent: [ '' ]);
-		version: (aDict at: 'version' ifAbsent: [ 1 ]);
-		withdrawalReason: (aDict at: 'withdrawal_reason' ifAbsent: [ nil ]);
-		submissionId: (aDict at: 'submission_id' ifAbsent: [ nil ]);
-		assessmentPromptVersion: (aDict at: 'assessment_prompt_version' ifAbsent: [ nil ]);
-		yourself.
-	"Parse status"
-	statusStr := aDict at: 'status' ifAbsent: [ 'active' ].
-	paper status: statusStr asSymbol.
-	"Usa slug salvato se presente, altrimenti genera"
-	(aDict at: 'slug' ifAbsent: [ nil ])
-		ifNotNil: [ :s2 | paper slug: s2 ]
-		ifNil: [ paper generateSlug ].
-	^ paper
+    "Crea un ATPaper da un dizionario"
+    | paper statusStr trackStr |
+    paper := self new
+        title: (aDict at: 'title' ifAbsent: [ '' ]);
+        authors: (aDict at: 'author' ifAbsent: [ '' ]);
+        aiModels: (aDict at: 'ai_model' ifAbsent: [ '' ]);
+        date: (aDict at: 'date' ifAbsent: [ '' ]);
+        pages: (aDict at: 'pages' ifAbsent: [ '' ]);
+        pdfFile: (aDict at: 'pdf_file' ifAbsent: [ '' ]);
+        abstract: (aDict at: 'abstract' ifAbsent: [ '' ]);
+        aiAssessment: (aDict at: 'ai_assessment' ifAbsent: [ '' ]);
+        aiCollaboration: (aDict at: 'ai_collaboration' ifAbsent: [ '' ]);
+        notes: (aDict at: 'notes' ifAbsent: [ '' ]);
+        version: (aDict at: 'version' ifAbsent: [ 1 ]);
+        withdrawalReason: (aDict at: 'withdrawal_reason' ifAbsent: [ nil ]);
+        submissionId: (aDict at: 'submission_id' ifAbsent: [ nil ]);
+        assessmentPromptVersion: (aDict at: 'assessment_prompt_version' ifAbsent: [ nil ]);
+        yourself.
+    "Parse status"
+    statusStr := aDict at: 'status' ifAbsent: [ 'active' ].
+    paper status: statusStr asSymbol.
+    "Parse track"
+    trackStr := aDict at: 'track' ifAbsent: [ 'workingPaper' ].
+    paper track: trackStr asSymbol.
+    "Usa slug salvato se presente, altrimenti genera"
+    (aDict at: 'slug' ifAbsent: [ nil ])
+        ifNotNil: [ :s2 | paper slug: s2 ]
+        ifNil: [ paper generateSlug ].
+    ^ paper
 ]
 
 { #category : 'accessing' }
@@ -95,24 +100,25 @@ aiModels := anObject
 
 { #category : 'converting' }
 ATPaper >> asDictionary [
-	^ Dictionary new
-		at: 'title' put: title;
-		at: 'author' put: authors;
-		at: 'ai_model' put: aiModels;
-		at: 'date' put: date;
-		at: 'pages' put: pages;
-		at: 'pdf_file' put: pdfFile;
-		at: 'abstract' put: (abstract ifNil: [ '' ]);
-		at: 'ai_assessment' put: (aiAssessment ifNil: [ '' ]);
-		at: 'ai_collaboration' put: (aiCollaboration ifNil: [ '' ]);
-		at: 'notes' put: (notes ifNil: [ '' ]);
-		at: 'slug' put: slug;
-		at: 'version' put: self version;
-		at: 'status' put: self status asString;
-		at: 'withdrawal_reason' put: (withdrawalReason ifNil: [ '' ]);
-		at: 'submission_id' put: (submissionId ifNil: [ '' ]);
-		at: 'assessment_prompt_version' put: (assessmentPromptVersion ifNil: [ '' ]);
-		yourself
+    ^ Dictionary new
+        at: 'title' put: title;
+        at: 'author' put: authors;
+        at: 'ai_model' put: aiModels;
+        at: 'date' put: date;
+        at: 'pages' put: pages;
+        at: 'pdf_file' put: pdfFile;
+        at: 'abstract' put: (abstract ifNil: [ '' ]);
+        at: 'ai_assessment' put: (aiAssessment ifNil: [ '' ]);
+        at: 'ai_collaboration' put: (aiCollaboration ifNil: [ '' ]);
+        at: 'notes' put: (notes ifNil: [ '' ]);
+        at: 'slug' put: slug;
+        at: 'version' put: self version;
+        at: 'status' put: self status asString;
+        at: 'track' put: self track asString;
+        at: 'withdrawal_reason' put: (withdrawalReason ifNil: [ '' ]);
+        at: 'submission_id' put: (submissionId ifNil: [ '' ]);
+        at: 'assessment_prompt_version' put: (assessmentPromptVersion ifNil: [ '' ]);
+        yourself
 ]
 
 { #category : 'converting' }
@@ -171,8 +177,20 @@ ATPaper >> isActive [
 ]
 
 { #category : 'testing' }
+ATPaper >> isTest [ ^ isTest ifNil: [ false ]
+]
+
+{ #category : 'testing' }
+ATPaper >> isTest: aBoolean [ isTest := aBoolean
+]
+
+{ #category : 'testing' }
 ATPaper >> isWithdrawn [
 	^ self status = #withdrawn
+]
+
+{ #category : 'testing' }
+ATPaper >> markAsTest [ isTest := true
 ]
 
 { #category : 'accessing' }
@@ -243,6 +261,14 @@ ATPaper >> title [
 { #category : 'accessing' }
 ATPaper >> title: anObject [
 title := anObject
+]
+
+{ #category : 'accessing' }
+ATPaper >> track [ ^ track ifNil: [ #workingPaper ]
+]
+
+{ #category : 'accessing' }
+ATPaper >> track: aSymbol [ track := aSymbol
 ]
 
 { #category : 'accessing' }

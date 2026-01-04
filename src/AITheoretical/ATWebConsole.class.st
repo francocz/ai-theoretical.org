@@ -64,6 +64,18 @@ ATWebConsole >> deletePaperAtSlug: aSlug [
 ]
 
 { #category : 'actions' }
+ATWebConsole >> deleteSubmissionAtIndex: indexString [
+	| index pending sub |
+	index := indexString asInteger.
+	pending := ATRepository current pendingSubmissions reject: [ :s |
+		((ATAutomation current instVarNamed: 'processedIds') includes: s id) or: [
+			ATAutomation current pendingApprovals anySatisfy: [ :a | a submission id = s id ] ] ].
+	(index < 1 or: [ index > pending size ]) ifTrue: [ ^ self ].
+	sub := pending at: index.
+	sub delete
+]
+
+{ #category : 'actions' }
 ATWebConsole >> doBackup [
 	| repo backupDir timestamp papersFile submissionsFile |
 	repo := ATRepository current.
@@ -182,6 +194,14 @@ ATWebConsole >> handleAuditClear [
 	^ self redirectTo: '/audit'
 ]
 
+{ #category : 'handlers' }
+ATWebConsole >> handleDeletePaper: req [
+	| index |
+	index := req at: #index ifAbsent: [ ^ self redirectToRoot ].
+	self deletePaperAtIndex: index.
+	^ self redirectToRoot
+]
+
 { #category : 'actions' }
 ATWebConsole >> handleModelChange: req [
 	| params model |
@@ -279,6 +299,18 @@ ATWebConsole >> port [
 { #category : 'accessing' }
 ATWebConsole >> port: aNumber [
 	port := aNumber
+]
+
+{ #category : 'actions' }
+ATWebConsole >> processAtIndex: indexString [
+	| index pending sub |
+	index := indexString asInteger.
+	pending := ATRepository current pendingSubmissions reject: [ :s |
+		((ATAutomation current instVarNamed: 'processedIds') includes: s id) or: [
+			ATAutomation current pendingApprovals anySatisfy: [ :a | a submission id = s id ] ] ].
+	(index < 1 or: [ index > pending size ]) ifTrue: [ ^ self ].
+	sub := pending at: index.
+	ATAutomation current processSubmission: sub
 ]
 
 { #category : 'actions' }
@@ -552,8 +584,11 @@ ATWebConsole >> renderPage [
 		h nextPutAll: '.btn-green{background:#4CAF50;color:white}.btn-red{background:#f44336;color:white}'.
 		h nextPutAll: '.btn-blue{background:#2196F3;color:white}.btn-gray{background:#9e9e9e;color:white}'.
 		h nextPutAll: '.approval{background:#fff3cd;padding:15px;margin:10px 0;border-radius:8px;border:1px solid #ffc107}'.
-		h nextPutAll: '.verdict-accept{color:#4CAF50}.verdict-reject{color:#f44336}'.
-		h nextPutAll: '.nav{margin-bottom:20px}</style></head><body>'.
+		h nextPutAll: '.verdict-accept{color:#4CAF50;font-weight:bold}.verdict-reject{color:#f44336;font-weight:bold}'.
+		h nextPutAll: '.nav{margin-bottom:20px}'.
+		h nextPutAll: 'details{margin:10px 0}summary{cursor:pointer;color:#2196F3;font-weight:500}'.
+		h nextPutAll: 'details pre{background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:15px;margin-top:10px;white-space:pre-wrap;word-wrap:break-word;max-height:400px;overflow-y:auto;font-size:13px}'.
+		h nextPutAll: '</style></head><body>'.
 		h nextPutAll: '<div class="nav"><a href="/ai">🤖 AI Config</a> | <a href="/audit">📋 Audit Log</a> | <a href="/settings">⚙️ Settings</a> | <a href="/prompt">📝 Edit Prompt</a></div>'.
 		h nextPutAll: '<h1>AI-Theoretical Console</h1>'.
 		h nextPutAll: self renderStatus.
@@ -590,26 +625,42 @@ ATWebConsole >> renderPapers [
 			h nextPutAll: '<td style="padding:8px">'; nextPutAll: (self escapeHtml: p authors); nextPutAll: '</td>'.
 			h nextPutAll: '<td style="padding:8px">'; nextPutAll: p status asString; nextPutAll: '</td>'.
 			h nextPutAll: '<td style="padding:8px;text-align:center">'.
-			h nextPutAll: '<form method="post" style="display:inline" onsubmit="return confirm(''Delete this paper and all associated files?'')">'.
-			h nextPutAll: '<button class="btn btn-red" style="padding:5px 10px" formaction="/paper/delete/'.
-			h nextPutAll: idx asString.
-			h nextPutAll: '">Delete</button></form>'.
+			h nextPutAll: '<form method="post" action="/paper/delete" style="display:inline" onsubmit="return confirm(''Delete this paper and all associated files?'')">'.
+			h nextPutAll: '<input type="hidden" name="index" value="'; nextPutAll: idx asString; nextPutAll: '">'.
+			h nextPutAll: '<button class="btn btn-red" style="padding:5px 10px">Delete</button></form>'.
 			h nextPutAll: '</td></tr>' ].
 		h nextPutAll: '</table>' ]
 ]
 
 { #category : 'rendering' }
 ATWebConsole >> renderPending [
-	| pending |
+	| pending processedIds |
 	pending := ATRepository current pendingSubmissions.
+	processedIds := ATAutomation current instVarNamed: 'processedIds'.
+	
+	"Filtra: mostra solo quelle NON ancora in processedIds e NON in pendingApprovals"
+	pending := pending reject: [ :sub |
+		(processedIds includes: sub id) or: [
+			ATAutomation current pendingApprovals anySatisfy: [ :a | a submission id = sub id ] ] ].
+	
 	pending ifEmpty: [ 
-		^ '<h2>Pending Submissions</h2><p>No pending submissions.</p>' ].
+		^ '<h2>Pending Submissions</h2><p>No pending submissions awaiting processing.</p>' ].
+	
 	^ String streamContents: [ :h |
 		h nextPutAll: '<h2>Pending Submissions</h2>'.
-		h nextPutAll: '<ul>'.
-		pending do: [ :sub |
-			h nextPutAll: '<li><strong>'; nextPutAll: sub title; nextPutAll: '</strong> by '; nextPutAll: sub authorName; nextPutAll: '</li>' ].
-		h nextPutAll: '</ul>' ]
+		h nextPutAll: '<p>These submissions need AI assessment:</p>'.
+		pending doWithIndex: [ :sub :idx |
+			h nextPutAll: '<div class="status" style="margin:10px 0">'.
+			h nextPutAll: '<strong>'; nextPutAll: (self escapeHtml: sub title); nextPutAll: '</strong>'.
+			h nextPutAll: ' by '; nextPutAll: (self escapeHtml: sub authorName).
+			h nextPutAll: '<br><small>Submitted: '; nextPutAll: sub submittedAt asString; nextPutAll: '</small>'.
+			h nextPutAll: '<form method="post" style="display:inline;margin-left:20px">'.
+			h nextPutAll: '<button class="btn btn-blue" formaction="/process/'; nextPutAll: idx asString; nextPutAll: '">Process</button>'.
+			h nextPutAll: '</form>'.
+			h nextPutAll: '<form method="post" style="display:inline">'.
+			h nextPutAll: '<button class="btn btn-red" formaction="/delete-submission/'; nextPutAll: idx asString; nextPutAll: '">Delete</button>'.
+			h nextPutAll: '</form>'.
+			h nextPutAll: '</div>' ] ]
 ]
 
 { #category : 'rendering' }
@@ -748,7 +799,15 @@ ATWebConsole >> renderStatus [
 		h nextPutAll: '</div>' ]
 ]
 
-{ #category : 'setup' }
+{ #category : 'control' }
+ATWebConsole >> restart [
+	"Riavvia la console ricaricando le route"
+	self stop.
+	teapot := nil.
+	self start
+]
+
+{ #category : 'initialization' }
 ATWebConsole >> setupRoutes [
 	teapot
 		"Main pages"
@@ -766,15 +825,17 @@ ATWebConsole >> setupRoutes [
 		POST: '/mode/full' -> [ :req | ATAutomation current fullAuto. self redirectToRoot ];
 		POST: '/mode/semi' -> [ :req | ATAutomation current semiAuto. self redirectToRoot ];
 		
+		"Submission processing"
+		POST: '/process/:index' -> [ :req | self processAtIndex: (req at: #index). self redirectToRoot ];
+		POST: '/delete-submission/:index' -> [ :req | self deleteSubmissionAtIndex: (req at: #index). self redirectToRoot ];
+		
 		"Approval actions"
 		POST: '/approve/:index' -> [ :req | self approveAtIndex: (req at: #index). self redirectToRoot ];
 		POST: '/reject/:index' -> [ :req | self rejectAtIndex: (req at: #index). self redirectToRoot ];
 		POST: '/approve-all' -> [ :req | ATAutomation current approveAllPending. ATRepository current deploy. self redirectToRoot ];
 		
-		"Paper management - usa indice invece di slug"
-		POST: '/paper/delete/:index' -> [ :req | 
-			self deletePaperAtIndex: (req at: #index). 
-			self redirectToRoot ];
+		"Paper management - usa POST body"
+		POST: '/paper/delete' -> [ :req | self handleDeletePaper: req ];
 		
 		"Prompt management"
 		POST: '/prompt' -> [ :req | self updatePrompt: req. self redirectTo: '/prompt' ];

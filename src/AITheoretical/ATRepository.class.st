@@ -162,7 +162,7 @@ ATRepository >> asJavaScript [
 		stream nextPutAll: lf.
 		stream nextPutAll: '        pages: "'; nextPutAll: (self escapeJsQuotes: (paper pages ifNil: [ '' ])); nextPutAll: '",'.
 		stream nextPutAll: lf.
-		stream nextPutAll: '        pdf_file: "'; nextPutAll: (self escapeJsQuotes: (paper pdfFile ifNil: [ 'papers/', paper slug, '.pdf' ])); nextPutAll: '",'.
+		stream nextPutAll: '        pdf_file: "papers/'; nextPutAll: (self escapeJsQuotes: paper slug); nextPutAll: '.pdf",'.
 		stream nextPutAll: lf.
 		stream nextPutAll: '        seo_page: "papers/'; nextPutAll: (self escapeJsQuotes: paper slug); nextPutAll: '.html",'.
 		stream nextPutAll: lf.

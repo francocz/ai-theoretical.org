@@ -1,2 +1,6 @@
 # OAuth secrets
 secrets/
+
+# Secrets
+config/anthropic_api_key.txt
+secrets/
