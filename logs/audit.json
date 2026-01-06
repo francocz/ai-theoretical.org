@@ -512,5 +512,12 @@
 		"author" : "Franco ",
 		"type" : "assessment",
 		"promptHash" : "28777176"
+	},
+	{
+		"timestamp" : "2026-01-06T20:50:34.819801+01:00",
+		"submissionId" : "1a882a15-2b0c-4c16-bb22-3a57c68fb4af",
+		"title" : "The Stack of Local Representations on a Coadjoint Orbit: A Categorical Approach",
+		"type" : "decision",
+		"decision" : "accept"
 	}
 ]
