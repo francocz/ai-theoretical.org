@@ -32,13 +32,10 @@ function matchesPaper(paper, query) {
     return words.every(word => searchable.includes(word));
 }
 
-function getActivePapers() {
-    return allPapers.filter(p => p.status === "active");
-}
-
 function getFilteredPapers() {
     const query = searchInput.value.trim();
-    let filtered = getActivePapers().filter(p => {
+    let filtered = allPapers.filter(p => {
+        if (p.status !== "active") return false;
         if (!matchesPaper(p, query)) return false;
         if (currentTrack !== "all" && p.track !== currentTrack) return false;
         return true;
@@ -72,7 +69,7 @@ function renderAll() {
         renderPapersCompact(filtered, query);
     }
     
-    updateStatus(filtered.length, getActivePapers().length);
+    updateStatus(filtered.length, allPapers.filter(p => p.status === "active").length);
     updateTrackCounts();
 }
 
@@ -166,25 +163,16 @@ function updateStatus(shown, total) {
 }
 
 function updateTrackCounts() {
-    const activePapers = getActivePapers();
     document.querySelectorAll(".track-btn").forEach(btn => {
         const track = btn.dataset.track;
         let count;
         if (track === "all") {
-            count = activePapers.length;
+            count = allPapers.filter(p => p.status === "active").length;
         } else {
-            count = activePapers.filter(p => p.track === track).length;
+            count = allPapers.filter(p => p.status === "active" && p.track === track).length;
         }
-        // Remove old count span
         const existing = btn.querySelector(".track-count");
         if (existing) existing.remove();
-        // Remove old text count if any
-        btn.childNodes.forEach(node => {
-            if (node.nodeType === 3) { // text node
-                node.textContent = node.textContent.replace(/\s*\d+\s*$/, '');
-            }
-        });
-        // Add new count span
         const countSpan = document.createElement("span");
         countSpan.className = "track-count";
         countSpan.textContent = count;
