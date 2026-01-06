@@ -258,8 +258,9 @@ button[type="submit"]:disabled {
     <div class="form-section-title">Author Information</div>
     
     <div class="form-group">
-        <label for="authorName" class="required">Full Name</label>
-        <input type="text" id="authorName" name="authorName" required>
+        <label for="authorName" class="required">Corresponding Author</label>
+        <input type="text" id="authorName" name="authorName" required placeholder="Full name">
+        <p class="help-text">The corresponding author will receive all communications about this submission.</p>
     </div>
     
     <div class="form-group">
@@ -272,6 +273,12 @@ button[type="submit"]:disabled {
         <label for="authorAffiliation">Affiliation</label>
         <input type="text" id="authorAffiliation" name="authorAffiliation" placeholder="University, Institute, or Independent">
         <p class="help-text">Optional. Will be displayed alongside your name if provided.</p>
+    </div>
+    
+    <div class="form-group">
+        <label for="coAuthors">Co-authors</label>
+        <input type="text" id="coAuthors" name="coAuthors" placeholder="e.g., Maria Rossi (MIT), John Smith (Stanford)">
+        <p class="help-text">Optional. List additional authors with their affiliations.</p>
     </div>
     
     <div class="form-section-title">Paper Information</div>

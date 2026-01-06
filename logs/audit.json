@@ -295,5 +295,37 @@
 		"title" : "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
 		"type" : "decision",
 		"decision" : "accept"
+	},
+	{
+		"outputTokens" : 361,
+		"inputTokens" : 21151,
+		"timestamp" : "2026-01-06T14:14:06.545302+01:00",
+		"submissionId" : "9562711c-a68c-4c9e-9c4b-5524e556a6b5",
+		"estimatedCostUSD" : 0.068868,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-20250514",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-20250514",
+		"verdict" : "accept",
+		"title" : "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
+		"assessmentLength" : 1690,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-06T14:14:06.556034+01:00",
+		"assessment" : "1) Category: Working paper (as declared by author).\n2) Aims: Documents the development of an automated preprint repository through direct human-AI collaboration, analyzing the implications of this development pattern for software engineering.\n3) Correctness: No errors identified.\n4) Coherence: Adequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Low (Transparent).\n7) Novelty: Original.\n8) Bibliography: Limited but sufficient.\n9) Effectiveness: Achieves aims.\n10) Cross-framework traction: High.\n11) Claims: Supported.\n12) Contribution: Substantive.\n13) Structure: Adequate.\n14) Integrity: No issues.\n15) Code: Coherent with paper.\n16) Editorial outcome: Suitable for inclusion as a working paper.\n\nThis paper presents an original empirical study of human-AI collaborative software development using the Model Context Protocol to enable direct AI manipulation of a Pharo Smalltalk image. The work demonstrates a novel development paradigm where the AI operates as primary implementer while the human functions as specifier and acceptance tester. The technical documentation is thorough, providing concrete metrics and architectural details. The analysis of pair programming dynamics offers substantive theoretical insights about cognitive division of labor in human-AI collaboration. The bibliography adequately covers the immediate technical dependencies (MCP, Pharo, pair programming literature) without attempting encyclopedic coverage. The paper's transparency about limitations and the unusual co-authorship arrangement enhances its integrity. The working system and available source code provide empirical grounding for the theoretical claims about this development approach.",
+		"promptVersion" : "2.0",
+		"submissionId" : "9562711c-a68c-4c9e-9c4b-5524e556a6b5",
+		"temperature" : 0,
+		"author" : "FC",
+		"type" : "assessment",
+		"promptHash" : "61488463"
+	},
+	{
+		"timestamp" : "2026-01-06T14:14:52.84416+01:00",
+		"submissionId" : "9562711c-a68c-4c9e-9c4b-5524e556a6b5",
+		"title" : "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
+		"type" : "decision",
+		"decision" : "reject"
 	}
 ]
