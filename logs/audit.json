@@ -384,5 +384,12 @@
 		"author" : "Franco Cazzaniga",
 		"type" : "assessment",
 		"promptHash" : "28777176"
+	},
+	{
+		"timestamp" : "2026-01-06T18:06:25.711026+01:00",
+		"submissionId" : "d44b0715-8496-444a-9728-ddc99743762d",
+		"title" : "Wave Function Collapse as Lie Algebra Contraction: The SU(2) Spin-1/2 Paradigm",
+		"type" : "decision",
+		"decision" : "accept"
 	}
 ]
