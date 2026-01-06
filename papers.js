@@ -8,6 +8,7 @@ const PAPERS_DATA = [
         pdf_file: "papers/image-based-development-with-llm-agents.pdf",
         seo_page: "papers/image-based-development-with-llm-agents.html",
         slug: "image-based-development-with-llm-agents",
+        track: "workingPaper",
         version: 1,
         status: "active",
         withdrawal_reason: "",
