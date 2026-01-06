@@ -327,5 +327,30 @@
 		"title" : "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
 		"type" : "decision",
 		"decision" : "reject"
+	},
+	{
+		"outputTokens" : 372,
+		"inputTokens" : 21247,
+		"timestamp" : "2026-01-06T15:38:34.674992+01:00",
+		"submissionId" : "62a1284e-2045-4658-b82b-4ab022ede715",
+		"estimatedCostUSD" : 0.069321,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-20250514",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-20250514",
+		"verdict" : "accept",
+		"title" : "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
+		"assessmentLength" : 1749,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-06T15:38:34.68981+01:00",
+		"assessment" : "1) Category: Working paper (as declared by author).\n2) Aims: Documents the development of an automated preprint repository through direct human-AI collaboration, analyzing the implications for software development patterns.\n3) Correctness: No errors identified.\n4) Coherence: Adequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Low (Transparent).\n7) Novelty: Original.\n8) Bibliography: Limited but sufficient.\n9) Effectiveness: Achieves aims.\n10) Cross-framework traction: Medium.\n11) Claims: Supported.\n12) Contribution: Substantive.\n13) Structure: Adequate.\n14) Integrity: No issues.\n15) Code: Coherent with paper.\n16) Editorial outcome: Suitable for inclusion as a working paper.\n17) Authors list: [\"Franco Cazzaniga\", \"Claude\"]\n\nThis paper presents an original empirical study of human-AI collaborative software development using the Model Context Protocol to enable direct AI manipulation of a Pharo Smalltalk image. The work demonstrates substantive contribution through its novel methodology of eliminating the traditional human-mediated code transfer loop, allowing the AI agent to operate directly on the runtime environment. The documentation is methodologically sound, providing quantitative metrics and qualitative observations from the 72-hour development process. The architectural choices are well-justified by practical constraints, and the comparison between conventional AI assistance and direct runtime access illuminates meaningful distinctions in cognitive division of labor. The bibliography adequately covers the technical dependencies without attempting encyclopedic coverage. The paper achieves its stated aims of documenting this development pattern and analyzing its implications for software engineering practices.",
+		"promptVersion" : "2.0",
+		"submissionId" : "62a1284e-2045-4658-b82b-4ab022ede715",
+		"temperature" : 0,
+		"author" : "Franco Cazzaniga",
+		"type" : "assessment",
+		"promptHash" : "30776123"
 	}
 ]
