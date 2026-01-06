@@ -288,5 +288,12 @@
 		"author" : "FC",
 		"type" : "assessment",
 		"promptHash" : "61488463"
+	},
+	{
+		"timestamp" : "2026-01-06T12:26:42.812889+01:00",
+		"submissionId" : "88f6a906-b4dd-4b6d-82fa-f951e41eb5fe",
+		"title" : "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
+		"type" : "decision",
+		"decision" : "accept"
 	}
 ]

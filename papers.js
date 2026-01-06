@@ -1,57 +1,13 @@
 const PAPERS_DATA = [
-    {
-        title: "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
-        author: "FC ()",
-        ai_model: "claude",
-        date: "",
-        pages: "",
-        pdf_file: "papers/image-based-development-with-llm-agents.pdf",
-        seo_page: "papers/image-based-development-with-llm-agents.html",
-        slug: "image-based-development-with-llm-agents",
-        version: 1,
-        status: "active",
-        withdrawal_reason: "",
-        abstract: `This paper documents the development of ai-theoretical.org, an automated academic
-preprint repository, built through direct collaboration between a human and an AI de-
-veloper. After an initial setup phase (“Day 0”) where the human configured the cloud
-infrastructure, approximately 72 hours of development followed with Claude (Anthropic)
-operating directly on a live Pharo Smalltalk image as the primary implementer. The project
-employed the Model Context Protocol (MCP) to give the language model full access to
-the runtime environment, enabling it to inspect objects, compile methods, execute tests,
-and iterate without human mediation at the code level. We describe the architecture, the
-development process, the distinctive nature of pair programming in this context, and the
-implications of this pattern for software development. The complete source code is available
-at https://github.com/ai-theoretical/ai-theoretical.org.`,
-        ai_assessment: `1) Category: Research preprint (as declared by author).
-2) Aims: Documents the development of an automated preprint repository through direct human-AI collaboration, analyzing the technical process and implications for software development patterns.
-3) Correctness: No errors identified.
-4) Coherence: Adequate.
-5) Consistency: Consistent.
-6) Semantic opacity: Low (Transparent).
-7) Novelty: Original.
-8) Bibliography: Limited but sufficient.
-9) Effectiveness: Achieves aims.
-10) Cross-framework traction: Medium.
-11) Claims: Supported.
-12) Contribution: Substantive.
-13) Structure: Adequate.
-14) Integrity: No issues.
-15) Code: Coherent with paper.
-16) Editorial outcome: Suitable for inclusion as a research preprint.
-
-This paper presents a systematic documentation of a novel development methodology where an LLM operates directly on a live programming environment through the Model Context Protocol. The technical exposition is clear and methodologically sound, with concrete metrics and architectural details supporting the claims. The work demonstrates substantive contribution by establishing a new mode of human-AI collaboration that eliminates the conventional proxy role of humans in AI-assisted development. The pair programming analogy provides effective analytical framework for understanding the cognitive division of labor. The bibliography, while limited, adequately covers the essential technical foundations (MCP, Pharo, pair programming literature). The experimental design is transparent, with clear delineation between infrastructure setup and AI-driven development phases. The limitations section appropriately acknowledges scope constraints and reproducibility issues. The technical implementation details and quantitative results provide sufficient evidence for the claims about development efficiency and process characteristics.`,
-        ai_collaboration: `claude`,
-        notes: ""
-    },
-    {
+];  {
         title: "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
         author: "FC ()",
         ai_model: "Claude ",
         date: "",
         pages: "",
-        pdf_file: "papers/image-based-development-with-llm-agents-2.pdf",
-        seo_page: "papers/image-based-development-with-llm-agents-2.html",
-        slug: "image-based-development-with-llm-agents-2",
+        pdf_file: "papers/image-based-development-with-llm-agents-3.pdf",
+        seo_page: "papers/image-based-development-with-llm-agents-3.html",
+        slug: "image-based-development-with-llm-agents-3",
         version: 1,
         status: "active",
         withdrawal_reason: "",
@@ -84,6 +40,54 @@ at https://github.com/ai-theoretical/ai-theoretical.org.`,
 16) Editorial outcome: Suitable for inclusion as a working paper.
 
 This paper presents an original empirical study of human-AI collaborative software development using the Model Context Protocol to enable direct AI manipulation of a Pharo Smalltalk image. The work demonstrates a novel development paradigm where the AI operates as primary implementer while the human functions as specifier and acceptance tester. The technical documentation is thorough, providing concrete metrics and architectural details. The analysis of pair programming dynamics offers substantive theoretical insights about cognitive division of labor in human-AI collaboration. The bibliography adequately covers the immediate technical dependencies (MCP, Pharo, pair programming literature) without attempting encyclopedic coverage. The paper's transparency about limitations and the unusual co-authorship arrangement enhances its integrity. The working system and available source code provide empirical grounding for the theoretical claims about this development approach.`,
+        ai_collaboration: `Claude `,
+        notes: ""
+    }
+];   {
+        title: "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
+        author: "FC ()",
+        ai_model: "Claude ",
+        date: "",
+        pages: "",
+        pdf_file: "papers/image-based-development-with-llm-agents-3.pdf",
+        seo_page: "papers/image-based-development-with-llm-agents-3.html",
+        slug: "image-based-development-with-llm-agents-3",
+        version: 1,
+        status: "active",
+        withdrawal_reason: "",
+        abstract: `This paper documents the development of ai-theoretical.org, an automated academic
+preprint repository, built through direct collaboration between a human and an AI de-
+veloper. After an initial setup phase (“Day 0”) where the human configured the cloud
+infrastructure, approximately 72 hours of development followed with Claude (Anthropic)
+operating directly on a live Pharo Smalltalk image as the primary implementer. The project
+employed the Model Context Protocol (MCP) to give the language model full access to
+the runtime environment, enabling it to inspect objects, compile methods, execute tests,
+and iterate without human mediation at the code level. We describe the architecture, the
+development process, the distinctive nature of pair programming in this context, and the
+implications of this pattern for software development. The complete source code is available
+at https://github.com/ai-theoretical/ai-theoretical.org.`,
+        ai_assessment: `1) Category: Working paper (as declared by author).
+2) Aims: Documents the development of an automated preprint repository through direct human-AI collaboration, analyzing the implications of this development pattern for software engineering.
+3) Correctness: No errors identified.
+4) Coherence: Adequate.
+5) Consistency: Consistent.
+6) Semantic opacity: Low (Transparent).
+7) Novelty: Original.
+8) Bibliography: Limited but sufficient.
+9) Effectiveness: Achieves aims.
+10) Cross-framework traction: High.
+11) Claims: Supported.
+12) Contribution: Substantive.
+13) Structure: Adequate.
+14) Integrity: No issues.
+15) Code: Coherent with paper.
+16) Editorial outcome: Suitable for inclusion as a working paper.
+
+This paper presents an original empirical study of human-AI collaborative software development using the Model Context Protocol to enable direct AI manipulation of a Pharo Smalltalk image. The work demonstrates a novel development paradigm where the AI operates as primary implementer while the human functions as specifier and acceptance tester. The technical documentation is thorough, providing concrete metrics and architectural details. The analysis of pair programming dynamics offers substantive theoretical insights about cognitive division of labor in human-AI collaboration. The bibliography adequately covers the immediate technical dependencies (MCP, Pharo, pair programming literature) without attempting encyclopedic coverage. The paper's transparency about limitations and the unusual co-authorship arrangement enhances its integrity. The working system and available source code provide empirical grounding for the theoretical claims about this development approach.`,
+        ai_collaboration: `Claude `,
+        notes: ""
+    }
+];de provide empirical grounding for the theoretical claims about this development approach.`,
         ai_collaboration: `Claude `,
         notes: ""
     },
