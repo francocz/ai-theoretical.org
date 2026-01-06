@@ -34,7 +34,7 @@ The complete source code is available at https://github.com/ai-theoretical/ai-th
 
 This paper presents an original empirical study of human-AI collaborative software development using the Model Context Protocol to enable direct AI manipulation of a Pharo Smalltalk image. The work demonstrates substantive contribution through its novel methodology of eliminating the traditional human-mediated code transfer loop, allowing the AI agent to operate directly on the runtime environment. The documentation is methodologically sound, providing quantitative metrics and qualitative observations from the 72-hour development process. The architectural choices are well-justified by practical constraints, and the comparison between conventional AI assistance and direct runtime access illuminates meaningful distinctions in cognitive division of labor. The bibliography adequately covers the technical dependencies without attempting encyclopedic coverage. The paper achieves its stated aims of documenting this development pattern and analyzing its implications for software engineering practices.`,
         ai_collaboration: `Claude Opus 4.5`,
-        notes: ""
+        notes: ``
     },
     {
         title: "Wave Function Collapse as Lie Algebra Contraction: The SU(2) Spin-1/2 Paradigm",
@@ -81,3 +81,4 @@ Throughout the development of the manuscript, the AI system functioned as a refl
 The scientific ideas, theoretical proposals, and final judgments presented in the paper remain the responsibility of the author. However, their formulation and presentation emerged from an iterative process of human–AI interaction, in which reasoning, critique, and synthesis were jointly developed through conversation. The present work should therefore be regarded as the outcome of a genuine human–AI collaborative process, in which the AI system actively participated in the development of the manuscript as a cognitive and conceptual partner.`
     }
 ];
+
