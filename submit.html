@@ -255,6 +255,18 @@ button[type="submit"]:disabled {
 <div id="errorMessage" class="message error hidden"></div>
 
 <form id="submissionForm">
+    <div class="form-group">
+        <label for="track" class="required">Submission Track</label>
+        <select id="track" name="track" required>
+            <option value="">-- Select a track --</option>
+            <option value="researchPreprint">Research Preprint</option>
+            <option value="workingPaper">Working Paper</option>
+            <option value="expositoryEssay">Expository/Theoretical Essay</option>
+            <option value="criticalReview">Critical Review</option>
+        </select>
+        <p class="help-text">See our <a href="editorial-principles.html">Editorial Framework</a> for track descriptions.</p>
+    </div>
+
     <div class="form-section-title">Author Information</div>
     
     <div class="form-group">
