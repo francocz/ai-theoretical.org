@@ -196,45 +196,5 @@ Editorial outcome: Suitable for inclusion as a research preprint.`,
         notes: `During the development of this work, the author made iterative use of AI-based tools to
 test and refine preliminary formulations. This proved instrumental in shaping the ideas
 into the coherent structure presented here.`
-    },
-    {
-        title: `The Stack of Local Representations on a Coadjoint Orbit: A Categorical Approach`,
-        author: `Franco  (uni)`,
-        ai_model: `Claude`,
-        date: ``,
-        pages: ``,
-        pdf_file: `papers/the-stack-of-local-representations-2.pdf`,
-        seo_page: `papers/the-stack-of-local-representations-2.html`,
-        slug: `the-stack-of-local-representations-2`,
-        track: `researchPreprint`,
-        version: 1,
-        status: `active`,
-        withdrawal_reason: ``,
-        abstract: `We construct a stack Rof local stabilizer representations over a coadjoint orbit O
-of a compact Lie group G, verify the descent conditions explicitly, and show that the
-G-action on global sections recovers the classical representation theory via geometric
-quantization. This provides a stack-theoretic interpretation of the Kirillov orbit
-method and the Borel–Weil theorem.`,
-        ai_assessment: `1) Category: Research preprint (as declared by author).
-2) Aims: To construct a stack of local stabilizer representations over coadjoint orbits and demonstrate that global sections recover classical representation theory via geometric quantization, providing a categorical interpretation of the Kirillov orbit method and Borel-Weil theorem.
-3) Correctness: No errors identified.
-4) Coherence: Adequate.
-5) Consistency: Consistent.
-6) Semantic opacity: Moderate (Justified complexity).
-7) Novelty: Original.
-8) Bibliography: Adequate.
-9) Effectiveness: Achieves aims.
-10) Cross-framework traction: Medium.
-11) Claims: Supported.
-12) Contribution: Substantive.
-13) Structure: Adequate.
-14) Integrity: No issues.
-15) Code (if provided): Not provided.
-16) Editorial outcome: Suitable for inclusion as a research preprint.
-17) Authors list: ["Franco Cazzaniga"]
-
-This paper presents a rigorous categorical framework for the orbit method by constructing an explicit stack of local stabilizer representations over coadjoint orbits. The mathematical development is technically sound, with detailed proofs of descent conditions and explicit verification that global sections correspond to induced representations. The connection between stack-theoretic transport and classical geometric quantization is well-established through concrete identifications with prequantum line bundles and their curvature properties. The work successfully unifies the Kirillov orbit method, compact induction, and Borel-Weil theorem under a single categorical umbrella. While the technical complexity is high, it is justified by the mathematical content. The bibliography adequately covers the relevant literature in representation theory, geometric quantization, and stack theory. The paper achieves its stated aims of providing a categorical interpretation of classical results while maintaining mathematical rigor throughout.`,
-        ai_collaboration: `Claude`,
-        notes: ``
     }
 ];
