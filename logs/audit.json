@@ -391,5 +391,126 @@
 		"title" : "Wave Function Collapse as Lie Algebra Contraction: The SU(2) Spin-1/2 Paradigm",
 		"type" : "decision",
 		"decision" : "accept"
+	},
+	{
+		"outputTokens" : 418,
+		"inputTokens" : 45717,
+		"timestamp" : "2026-01-06T19:55:04.524823+01:00",
+		"submissionId" : "dd18776c-00d7-4ff6-886c-783f672db5ce",
+		"estimatedCostUSD" : 0.143421,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-20250514",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-20250514",
+		"verdict" : "accept",
+		"title" : "The Invisible Pillar On the Genesis and Concealment of Dualism from the Pre-Socratics to the Moderns",
+		"assessmentLength" : 1900,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-06T19:55:04.53499+01:00",
+		"assessment" : "1) Category: Working paper (as declared by author).\n2) Aims: To trace the genealogy of Western dualism from pre-Socratics to modernity, making visible the invisible Platonic framework that has structured philosophical inquiry.\n3) Correctness: No errors identified.\n4) Coherence: Adequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Low (Transparent).\n7) Novelty: Original.\n8) Bibliography: Adequate.\n9) Effectiveness: Achieves aims.\n10) Cross-framework traction: High.\n11) Claims: Supported.\n12) Contribution: Substantive.\n13) Structure: Adequate.\n14) Integrity: No issues.\n15) Code (if provided): Not provided.\n16) Editorial outcome: Suitable for inclusion as a working paper.\n17) Authors list: [\"Franco Cazzaniga\"]\n\nThis paper presents an original genealogical analysis of Western philosophical dualism, tracing its development from pre-Socratic thought through Plato to modern philosophy. The central thesis that Plato's dualism became an \"invisible pillar\" structuring subsequent philosophical frameworks is well-supported through systematic examination of key historical figures. The author demonstrates how this dualism transformed across different periods while maintaining its fundamental structure, from epistemic distinctions in Plato to cosmological separations in the scientific revolution to metaphysical divisions in Descartes. The writing is clear and accessible, avoiding unnecessary jargon while maintaining philosophical rigor. The bibliography adequately covers the scope of inquiry, drawing on primary sources and established scholarship. The paper's strength lies in its synthetic approach, revealing continuities that are often obscured by focusing on apparent breaks or innovations. The argument that natural philosophers like Galileo and Newton were fundamentally philosophical in their approach adds valuable perspective to standard histories of science and philosophy.",
+		"promptVersion" : "2.0",
+		"submissionId" : "dd18776c-00d7-4ff6-886c-783f672db5ce",
+		"temperature" : 0,
+		"author" : "Franco Cazzaniga",
+		"type" : "assessment",
+		"promptHash" : "30776123"
+	},
+	{
+		"timestamp" : "2026-01-06T19:55:09.727698+01:00",
+		"submissionId" : "dd18776c-00d7-4ff6-886c-783f672db5ce",
+		"title" : "The Invisible Pillar On the Genesis and Concealment of Dualism from the Pre-Socratics to the Moderns",
+		"type" : "decision",
+		"decision" : "accept"
+	},
+	{
+		"outputTokens" : 415,
+		"inputTokens" : 112261,
+		"timestamp" : "2026-01-06T20:06:33.458797+01:00",
+		"submissionId" : "1c3702d0-764a-406a-af31-be8815d9c14a",
+		"estimatedCostUSD" : 0.343008,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-20250514",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-20250514",
+		"verdict" : "accept",
+		"title" : "The Invisible Wealth: Mismeasurement of Quality, the Myth of Stagnation, and the Underestimation of Real Income Growth",
+		"assessmentLength" : 2002,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-06T20:06:33.471833+01:00",
+		"assessment" : "1) Category: Research preprint (as declared by author).\n2) Aims: The paper aims to demonstrate that conventional economic measurement systematically understates real income growth by failing to capture quality improvements, dematerialization, and new goods creation, arguing this explains apparent wage stagnation.\n3) Correctness: No errors identified.\n4) Coherence: Adequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Moderate (Justified complexity).\n7) Novelty: Reformulative.\n8) Bibliography: Adequate.\n9) Effectiveness: Achieves aims.\n10) Cross-framework traction: Medium.\n11) Claims: Supported.\n12) Contribution: Substantive.\n13) Structure: Adequate.\n14) Integrity: No issues.\n15) Code (if provided): Not provided.\n16) Editorial outcome: Suitable for inclusion as a research preprint.\n17) Authors list: [\"Franco Cazzaniga\"]\n\nThe paper presents a comprehensive framework for reconceptualizing economic measurement through an attribute-based approach that decomposes goods into quality, dematerialization, and risk-reduction components. The theoretical foundation is mathematically coherent, building systematically from Lancaster's characteristics theory and Rosen's hedonic framework. The empirical applications across refrigerators, automobiles, smartphones, and healthcare demonstrate measurable magnitudes for each adjustment component. The healthcare case study using Time-Driven Activity-Based Costing provides particularly strong evidence for institutional friction effects. While the core argument about measurement bias reformulates existing insights from the Boskin Commission and subsequent literature rather than introducing fundamentally new concepts, the unified theoretical treatment and systematic decomposition represent a substantive contribution. The paper maintains internal consistency across its extensive technical apparatus and successfully integrates diverse empirical evidence to support its central thesis about the systematic understatement of real income growth.",
+		"promptVersion" : "2.0",
+		"submissionId" : "1c3702d0-764a-406a-af31-be8815d9c14a",
+		"temperature" : 0,
+		"author" : "Franco Cazzaniga",
+		"type" : "assessment",
+		"promptHash" : "28777176"
+	},
+	{
+		"timestamp" : "2026-01-06T20:06:37.893119+01:00",
+		"submissionId" : "1c3702d0-764a-406a-af31-be8815d9c14a",
+		"title" : "The Invisible Wealth: Mismeasurement of Quality, the Myth of Stagnation, and the Underestimation of Real Income Growth",
+		"type" : "decision",
+		"decision" : "accept"
+	},
+	{
+		"outputTokens" : 458,
+		"inputTokens" : 48435,
+		"timestamp" : "2026-01-06T20:11:55.54287+01:00",
+		"submissionId" : "4ee82e67-9f54-4014-b7fe-fccfe4baee98",
+		"estimatedCostUSD" : 0.152175,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-20250514",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-20250514",
+		"verdict" : "accept",
+		"title" : "The Stack of Local Representations on a Coadjoint Orbit: A Categorical Approach",
+		"assessmentLength" : 2099,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-06T20:11:55.549836+01:00",
+		"assessment" : "1) Category: Research preprint (as declared by author).\n2) Aims: To construct a stack of local stabilizer representations over coadjoint orbits and demonstrate that global sections recover classical representation theory via geometric quantization, providing a categorical interpretation of the Kirillov orbit method and Borel-Weil theorem.\n3) Correctness: No errors identified.\n4) Coherence: Adequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Moderate (Justified complexity).\n7) Novelty: Original.\n8) Bibliography: Adequate.\n9) Effectiveness: Achieves aims.\n10) Cross-framework traction: Medium.\n11) Claims: Supported.\n12) Contribution: Substantive.\n13) Structure: Adequate.\n14) Integrity: No issues.\n15) Code (if provided): Not provided.\n16) Editorial outcome: Suitable for inclusion as a research preprint.\n17) Authors list: [\"Franco Cazzaniga\"]\n\nThe paper presents a rigorous categorical framework unifying the Kirillov orbit method and geometric quantization through stack theory. The author constructs an explicit stack R of local stabilizer representations over coadjoint orbits, provides detailed verification of descent conditions, and establishes the equivalence between G-equivariant stacks and stacks over action groupoids. The technical execution is sound, with careful treatment of the gluing construction and explicit computation of curvature forms. The connection between rank-one global sections and prequantum line bundles is well-established, and the recovery of classical results through compact induction and Borel-Weil theory is convincingly demonstrated. The mathematical exposition maintains appropriate rigor while remaining accessible to readers familiar with representation theory and algebraic geometry. The bibliography adequately covers relevant literature in geometric quantization, stack theory, and representation theory. The work provides genuine conceptual insight by revealing representation theory as a descent phenomenon, offering a fresh categorical perspective on established results.\n\nEditorial outcome: Suitable for inclusion as a research preprint.",
+		"promptVersion" : "2.0",
+		"submissionId" : "4ee82e67-9f54-4014-b7fe-fccfe4baee98",
+		"temperature" : 0,
+		"author" : "Franco Cazzaniga",
+		"type" : "assessment",
+		"promptHash" : "28777176"
+	},
+	{
+		"timestamp" : "2026-01-06T20:11:59.338284+01:00",
+		"submissionId" : "4ee82e67-9f54-4014-b7fe-fccfe4baee98",
+		"title" : "The Stack of Local Representations on a Coadjoint Orbit: A Categorical Approach",
+		"type" : "decision",
+		"decision" : "accept"
+	},
+	{
+		"outputTokens" : 417,
+		"inputTokens" : 48437,
+		"timestamp" : "2026-01-06T20:50:25.673294+01:00",
+		"submissionId" : "1a882a15-2b0c-4c16-bb22-3a57c68fb4af",
+		"estimatedCostUSD" : 0.151566,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-20250514",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-20250514",
+		"verdict" : "accept",
+		"title" : "The Stack of Local Representations on a Coadjoint Orbit: A Categorical Approach",
+		"assessmentLength" : 1899,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-06T20:50:25.687439+01:00",
+		"assessment" : "1) Category: Research preprint (as declared by author).\n2) Aims: To construct a stack of local stabilizer representations over coadjoint orbits and demonstrate that global sections recover classical representation theory via geometric quantization, providing a categorical interpretation of the Kirillov orbit method and Borel-Weil theorem.\n3) Correctness: No errors identified.\n4) Coherence: Adequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Moderate (Justified complexity).\n7) Novelty: Original.\n8) Bibliography: Adequate.\n9) Effectiveness: Achieves aims.\n10) Cross-framework traction: Medium.\n11) Claims: Supported.\n12) Contribution: Substantive.\n13) Structure: Adequate.\n14) Integrity: No issues.\n15) Code (if provided): Not provided.\n16) Editorial outcome: Suitable for inclusion as a research preprint.\n17) Authors list: [\"Franco Cazzaniga\"]\n\nThis paper presents a rigorous categorical framework for the orbit method by constructing an explicit stack of local stabilizer representations over coadjoint orbits. The mathematical development is technically sound, with detailed proofs of descent conditions and explicit verification that global sections correspond to induced representations. The connection between stack-theoretic transport and classical geometric quantization is well-established through concrete identifications with prequantum line bundles and their curvature properties. The work successfully unifies the Kirillov orbit method, compact induction, and Borel-Weil theorem under a single categorical umbrella. While the technical complexity is high, it is justified by the mathematical content. The bibliography adequately covers the relevant literature in representation theory, geometric quantization, and stack theory. The paper achieves its stated aims of providing a categorical interpretation of classical results while maintaining mathematical rigor throughout.",
+		"promptVersion" : "2.0",
+		"submissionId" : "1a882a15-2b0c-4c16-bb22-3a57c68fb4af",
+		"temperature" : 0,
+		"author" : "Franco ",
+		"type" : "assessment",
+		"promptHash" : "28777176"
 	}
 ]
