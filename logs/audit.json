@@ -352,5 +352,12 @@
 		"author" : "Franco Cazzaniga",
 		"type" : "assessment",
 		"promptHash" : "30776123"
+	},
+	{
+		"timestamp" : "2026-01-06T15:38:59.28072+01:00",
+		"submissionId" : "62a1284e-2045-4658-b82b-4ab022ede715",
+		"title" : "Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours",
+		"type" : "decision",
+		"decision" : "accept"
 	}
 ]
