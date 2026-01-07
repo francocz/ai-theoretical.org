@@ -244,6 +244,39 @@ ATSiteGenerator >> googleScholarMetaTagsForPaper: aPaper to: stream [
 ]
 
 { #category : 'as yet unclassified' }
+ATSiteGenerator >> indexPaperOnAlgolia: aPaper [
+    "Indicizza o aggiorna un paper su Algolia"
+    | appId writeKey record client response |
+    
+    appId := 'KXM87UO2YZ'.
+    writeKey := 'e593d014d0083be2f97b125106489864'.
+    
+    record := Dictionary new
+        at: 'objectID' put: aPaper slug;
+        at: 'title' put: aPaper title;
+        at: 'authors' put: aPaper allAuthors asArray;
+        at: 'abstract' put: (aPaper abstract ifNil: [ '' ]);
+        at: 'track' put: (aPaper track ifNil: [ '' ]);
+        at: 'date' put: (aPaper date ifNil: [ '' ] ifNotNil: [ :d | d yyyymmdd ]);
+        at: 'slug' put: aPaper slug;
+        at: 'url' put: 'https://ai-theoretical.org/papers/', aPaper slug, '.html';
+        at: 'pdfUrl' put: 'https://ai-theoretical.org/papers/', aPaper slug, '.pdf';
+        yourself.
+    
+    client := ZnClient new.
+    response := client
+        url: 'https://', appId, '.algolia.net/1/indexes/papers/', aPaper slug;
+        headerAt: 'X-Algolia-API-Key' put: writeKey;
+        headerAt: 'X-Algolia-Application-Id' put: appId;
+        headerAt: 'Content-Type' put: 'application/json';
+        contents: (NeoJSONWriter toString: record);
+        put;
+        response.
+    
+    ^ response isSuccess
+]
+
+{ #category : 'as yet unclassified' }
 ATSiteGenerator >> jsonLdForPaper: aPaper [
     "Genera JSON-LD Schema.org per un paper accademico"
     | dict authorsList dateStr pdfUrl pageUrl |
@@ -346,6 +379,25 @@ footer { margin-top: 60px; padding-top: 30px; border-top: 1px solid var(--border
 ATSiteGenerator >> regenerateAll [
 self cleanSeoPages.
 ^ self generateAll
+]
+
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> removePaperFromAlgolia: aPaper [
+    "Rimuove un paper da Algolia (per withdrawal)"
+    | appId writeKey client response |
+    
+    appId := 'KXM87UO2YZ'.
+    writeKey := 'e593d014d0083be2f97b125106489864'.
+    
+    client := ZnClient new.
+    response := client
+        url: 'https://', appId, '.algolia.net/1/indexes/papers/', aPaper slug;
+        headerAt: 'X-Algolia-API-Key' put: writeKey;
+        headerAt: 'X-Algolia-Application-Id' put: appId;
+        delete;
+        response.
+    
+    ^ response isSuccess
 ]
 
 { #category : 'configuration' }

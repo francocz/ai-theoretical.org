@@ -110,6 +110,8 @@ ATIndexPage >> head [
         s << '    <meta property="og:description" content="Publishing high-quality theoretical papers co-authored by humans and AI.">'; << String lf.
         s << '    <meta property="og:url" content="https://ai-theoretical.org">'; << String lf.
         s << '    <meta property="og:type" content="website">'; << String lf.
+        s << '    <link rel="alternate" type="application/rss+xml" title="AI-Theoretical RSS Feed" href="https://ai-theoretical.org/feed.xml">'; << String lf.
+        s << '    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>'; << String lf.
         s << self fonts.
         s << '    <style>'; << String lf.
         s << self css.
