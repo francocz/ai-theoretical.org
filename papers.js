@@ -196,55 +196,5 @@ Editorial outcome: Suitable for inclusion as a research preprint.`,
         notes: `During the development of this work, the author made iterative use of AI-based tools to
 test and refine preliminary formulations. This proved instrumental in shaping the ideas
 into the coherent structure presented here.`
-    },
-    {
-        title: `Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours`,
-        author: `FC`,
-        ai_model: `claude`,
-        date: ``,
-        pages: ``,
-        pdf_file: `papers/image-based-development-with-llm-agents-2.pdf`,
-        seo_page: `papers/image-based-development-with-llm-agents-2.html`,
-        slug: `image-based-development-with-llm-agents-2`,
-        track: `expositoryEssay`,
-        version: 1,
-        status: `active`,
-        withdrawal_reason: ``,
-        abstract: `This paper documents the development of ai-theoretical.org, an automated academic
-preprint repository, built through direct collaboration between a human and an AI de-
-veloper. After an initial setup phase (“Day 0”) where the human configured the cloud
-infrastructure, approximately 72 hours of development followed with Claude (Anthropic)
-operating directly on a live Pharo Smalltalk image as the primary implementer. The project
-employed the Model Context Protocol (MCP) to give the language model full access to
-the runtime environment, enabling it to inspect objects, compile methods, execute tests,
-and iterate without human mediation at the code level. We describe the architecture, the
-development process, the distinctive nature of pair programming in this context, and the
-implications of this pattern for software development. The complete source code is available
-at https://github.com/ai-theoretical/ai-theoretical.org.`,
-        ai_assessment: `(A) STRUCTURED SUMMARY
-
-1) Category: Expository/theoretical essay (as declared by author).
-2) Aims: Documents the development process of ai-theoretical.org through human-AI collaboration, describing architecture, development methodology, and implications for software development patterns.
-3) Correctness: No errors identified.
-4) Coherence: Adequate.
-5) Consistency: Consistent.
-6) Semantic opacity: Low (Transparent).
-7) Pedagogical value: High (clear, well-structured, aids understanding).
-8) Bibliography: Limited but sufficient.
-9) Effectiveness: Achieves aims.
-10) Accuracy of representation: Faithful.
-11) Coverage: Adequate.
-12) Contribution: Valuable synthesis.
-13) Structure: Adequate.
-14) Integrity: No issues.
-15) Code (if provided): Coherent with paper.
-16) Editorial outcome: Suitable for inclusion as an expository essay.
-17) Authors list: ["Franco Cazzaniga", "Claude"]
-
-(B) EXTENDED ASSESSMENT
-
-This paper effectively documents a novel software development methodology using direct LLM-runtime integration through the Model Context Protocol. The exposition clearly explains the technical architecture, development timeline, and qualitative observations from the 72-hour implementation period. The authors provide transparent documentation of both successes and limitations, including session boundaries, Pharo specificity, and scale constraints. The comparison between conventional AI-assisted development and direct runtime access illuminates important distinctions in human-AI collaboration patterns. The paper's structure progresses logically from background through implementation to analysis, with concrete metrics and honest assessment of the approach's applicability. The pedagogical value is high due to clear explanations of technical concepts and thoughtful reflection on the implications for software development practices. While the bibliography is limited, it adequately supports the technical claims and provides necessary context for the tools and methodologies discussed.`,
-        ai_collaboration: `claude`,
-        notes: ``
     }
 ];
