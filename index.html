@@ -21,6 +21,61 @@
 /* Track filters */.track-filters {    display: flex;    flex-wrap: wrap;    gap: 8px;    margin: 20px 0;}.track-btn {    background: #f5f5f3;    border: 1px solid var(--border);    padding: 8px 16px;    font-size: 0.85rem;    font-family: inherit;    cursor: pointer;    transition: all 0.2s;    color: var(--text-muted);}.track-btn:hover {    background: #eee;}.track-btn.active {    background: var(--text-main);    color: white;    border-color: var(--text-main);}.track-count {    display: inline-block;    background: rgba(0,0,0,0.1);    padding: 2px 6px;    border-radius: 10px;    font-size: 0.75rem;    margin-left: 6px;}.track-btn.active .track-count {    background: rgba(255,255,255,0.2);}/* View controls */.view-controls {    display: flex;    justify-content: space-between;    align-items: center;    margin: 15px 0;}.view-toggle {    display: flex;    gap: 4px;}.view-btn {    background: #f5f5f3;    border: 1px solid var(--border);    padding: 6px 12px;    font-size: 1rem;    cursor: pointer;    color: var(--text-muted);}.view-btn:hover {    background: #eee;}.view-btn.active {    background: var(--text-main);    color: white;    border-color: var(--text-main);}.sort-select {    padding: 8px 12px;    font-size: 0.85rem;    font-family: inherit;    border: 1px solid var(--border);    background: white;    color: var(--text-main);}/* Track badges - pastel colors */.paper-track-badge {    display: inline-block;    font-size: 0.75rem;    padding: 4px 10px;    border-radius: 3px;    margin-bottom: 10px;    font-weight: 500;}.track-researchPreprint {    background: #e8f4f8;    color: #2c5f6e;}.track-workingPaper {    background: #f0f4e8;    color: #4a5f3c;}.track-expositoryEssay {    background: #faf3e8;    color: #6b5a3f;}.track-criticalReview {    background: #f3e8f4;    color: #5f3c6b;}/* Compact view */.compact-list {    border-top: 1px solid var(--border);}.compact-item {    display: grid;    grid-template-columns: 30px 1fr auto auto;    gap: 15px;    align-items: center;    padding: 12px 0;    border-bottom: 1px solid var(--border);    font-size: 0.9rem;}.compact-track {    font-size: 1.1rem;}.compact-title {    color: var(--text-main);    text-decoration: none;    font-weight: 500;}.compact-title:hover {    color: var(--accent-blue);}.compact-author {    color: var(--text-muted);    font-size: 0.85rem;}.compact-date {    color: var(--text-muted);    font-size: 0.8rem;    white-space: nowrap;}/* Pagination */.pagination {    display: flex;    justify-content: center;    align-items: center;    gap: 20px;    margin: 40px 0;    padding-top: 20px;    border-top: 1px solid var(--border);}.pagination button {    background: white;    border: 1px solid var(--border);    padding: 8px 16px;    font-family: inherit;    font-size: 0.85rem;    cursor: pointer;    color: var(--text-main);}.pagination button:hover {    background: #f5f5f3;}.page-info {    color: var(--text-muted);    font-size: 0.85rem;}    </style>
 </head>
 <body>
-<div class="container">    <header>        <div class="top-subtitle">Human-AI Theoretical Laboratory</div>        <h1>AI-Theoretical</h1>        <hr>    </header>    <div class="manifesto-grid">        <div class="manifesto-label">            <a href="manifesto.html">Manifesto</a>            <a href="editorial-principles.html">Editorial framework</a>            <a href="ai-editorial-prompt.html">AI editorial prompt</a>            <a href="invite.html">Invitation to participate</a>            <a href="submit.html">Submit a paper</a>        </div>        <div>            <div class="manifesto-quote">                "This platform collects and publishes scholarly papers openly co-authored by humans and frontier AI models. We experiment with new forms of knowledge production to reflect on authorship and epistemology in the age of synthetic intelligence."            </div>        </div>    </div>    <hr>    <div class="search-section">        <div class="search-box">            <input type="text" id="searchInput" class="search-input" placeholder="Search papers by title, author, abstract...">            <button id="searchBtn" class="search-btn" title="Search">🔍</button>        </div>                <div class="track-filters">            <button class="track-btn active" data-track="all">All</button>            <button class="track-btn" data-track="researchPreprint">Research Preprints</button>            <button class="track-btn" data-track="workingPaper">Working Papers</button>            <button class="track-btn" data-track="expositoryEssay">Expository Essays</button>            <button class="track-btn" data-track="criticalReview">Critical Reviews</button>        </div>                <div class="view-controls">            <div class="view-toggle">                <button class="view-btn active" data-view="full" title="Full view">☰</button>                <button class="view-btn" data-view="compact" title="Compact view">▤</button>            </div>            <select id="sortSelect" class="sort-select">                <option value="date-desc">Newest first</option>                <option value="date-asc">Oldest first</option>                <option value="title-asc">Title A-Z</option>                <option value="title-desc">Title Z-A</option>            </select>        </div>                <div id="searchStatus" class="search-results-count"></div>    </div>    <div id="repository"></div>        <footer>    Interested in participating? Contact <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>    <div class="powered-by">        Powered by <a href="https://www.anthropic.com/claude" target="_blank">Claude AI</a> and <a href="https://pharo.org" target="_blank">Pharo Smalltalk</a>    </div></footer></div>
+<div class="container">
+    <header>
+        <div class="top-subtitle">Human-AI Theoretical Laboratory</div>
+        <h1>AI-Theoretical</h1>
+        <hr>
+    </header>
+
+    <div class="manifesto-grid">
+        <div class="manifesto-label">
+            <a href="manifesto.html">Manifesto</a>
+            <a href="editorial-principles.html">Editorial framework</a>
+            <a href="ai-editorial-prompt.html">AI editorial prompt</a>
+            <a href="invite.html">Invitation to participate</a>
+            <a href="submit.html">Submit a paper</a>
+        </div>
+        <div>
+            <div class="manifesto-quote">
+                "This platform collects and publishes scholarly papers openly co-authored by humans and frontier AI models. We experiment with new forms of knowledge production to reflect on authorship and epistemology in the age of synthetic intelligence."
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <div class="search-section">
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search papers by title, author, abstract...">
+        </div>
+        
+        <div class="track-filters">
+            <button class="track-btn active" data-track="all">All</button>
+            <button class="track-btn" data-track="researchPreprint">Research Preprints</button>
+            <button class="track-btn" data-track="workingPaper">Working Papers</button>
+            <button class="track-btn" data-track="expositoryEssay">Expository Essays</button>
+            <button class="track-btn" data-track="criticalReview">Critical Reviews</button>
+        </div>
+        
+        <div class="view-controls">
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="full" title="Full view">☰</button>
+                <button class="view-btn" data-view="compact" title="Compact view">▤</button>
+            </div>
+            <select id="sortSelect" class="sort-select">
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="title-asc">Title A-Z</option>
+                <option value="title-desc">Title Z-A</option>
+            </select>
+        </div>
+        
+        <div id="searchStatus" class="search-results-count"></div>
+    </div>
+
+    <div id="repository"></div>
+    
+    <footer>    Interested in participating? Contact <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>    <div class="powered-by">        Powered by <a href="https://www.anthropic.com/claude" target="_blank">Claude AI</a> and <a href="https://pharo.org" target="_blank">Pharo Smalltalk</a>    </div></footer>
+</div>
 <script src="papers.js"></script><script src="index-app.js"></script></body>
 </html>
