@@ -68,6 +68,9 @@ ATRepository >> acceptRemoteSubmission: aSubmission withAssessment: assessmentTe
     papers add: paper.
     self saveToJsFile: gitRepoPath, '/papers.js'.
     
+    "Indicizza su Algolia"
+    ATSiteGenerator new indexPaperOnAlgolia: paper.
+    
     "Deploy automatico"
     ATDeployment deployGitRepoPath: gitRepoPath withMessage: 'Published: ', paper title.
     
@@ -281,6 +284,9 @@ ATRepository >> deletePaper: aPaper [
     
     "Cancella pagina SEO se esiste"
     seoFile exists ifTrue: [ seoFile delete ].
+    
+    "Rimuovi da Algolia"
+    ATSiteGenerator new removePaperFromAlgolia: aPaper.
     
     "Rimuovi dalla collection"
     papers remove: aPaper.
@@ -563,7 +569,7 @@ ATRepository >> newVersionForPaperWithSlug: aSlug token: aToken pdfBytes: pdfByt
             at: #error put: 'Paper not found.';
             yourself ].
     
-    "Verifica che il paper appartenga all''autore"
+    "Verifica che il paper appartenga all'autore"
     paper authorEmail asLowercase = request email asLowercase ifFalse: [
         ^ Dictionary new
             at: #success put: false;
@@ -589,6 +595,9 @@ ATRepository >> newVersionForPaperWithSlug: aSlug token: aToken pdfBytes: pdfByt
     
     "Aggiorna data"
     paper date: Date today.
+    
+    "Aggiorna su Algolia"
+    ATSiteGenerator new indexPaperOnAlgolia: paper.
     
     self savePapers.
     self regenerateAllPages.
@@ -1003,7 +1012,7 @@ ATRepository >> withdrawPaperWithSlug: aSlug token: aToken [
             at: #error put: 'Paper not found.';
             yourself ].
     
-    "Verifica che il paper appartenga all''autore"
+    "Verifica che il paper appartenga all'autore"
     paper authorEmail asLowercase = request email asLowercase ifFalse: [
         ^ Dictionary new
             at: #success put: false;
@@ -1018,6 +1027,10 @@ ATRepository >> withdrawPaperWithSlug: aSlug token: aToken [
     
     "Ritira il paper"
     paper withdraw.
+    
+    "Rimuovi da Algolia"
+    ATSiteGenerator new removePaperFromAlgolia: paper.
+    
     self savePapers.
     self regenerateAllPages.
     self deploy.
