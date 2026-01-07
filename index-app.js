@@ -9,6 +9,31 @@ let currentView = "full";
 let currentPage = 1;
 const PAPERS_PER_PAGE = 10;
 
+// Algolia configuration
+const ALGOLIA_APP_ID = "KXM87UO2YZ";
+const ALGOLIA_SEARCH_KEY = "9007e1d3d632c25e106acd34be41425c";
+let algoliaIndex = null;
+
+function initAlgolia() {
+    if (typeof algoliasearch !== "undefined") {
+        algoliaIndex = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY).initIndex("papers");
+    }
+}
+
+function doAlgoliaSearch() {
+    var query = searchInput.value.trim();
+    if (!query || !algoliaIndex) { filterAndRender(); return; }
+    var filters = currentTrack !== "all" ? "track:" + currentTrack : "";
+    algoliaIndex.search(query, { filters: filters, hitsPerPage: 50 }).then(function(results) {
+        var papers = results.hits.map(function(h) {
+            return { title: h.title, author: h.authors ? h.authors.join(", ") : "", abstract: h.abstract, track: h.track, slug: h.slug, date: h.date, pdf_file: "papers/" + h.slug + ".pdf", status: "active", ai_model: h.aiModels || "" };
+        });
+        currentPage = 1;
+        if (currentView === "full") { renderPapersFull(papers, query); } else { renderPapersCompact(papers, query); }
+        searchStatus.innerHTML = "<strong>" + results.nbHits + "</strong> results for \"" + query + "\" <span class=\"clear-search\" onclick=\"clearFilters()\">Clear</span>";
+    }).catch(function() { filterAndRender(); });
+}
+
 const TRACK_INFO = {
     researchPreprint: { label: "Research Preprint", icon: "📚" },
     workingPaper: { label: "Working Paper", icon: "📝" },
@@ -175,16 +200,13 @@ function updateTrackCounts() {
         } else {
             count = activePapers.filter(p => p.track === track).length;
         }
-        // Remove old count span
         const existing = btn.querySelector(".track-count");
         if (existing) existing.remove();
-        // Remove old text count if any
         btn.childNodes.forEach(node => {
-            if (node.nodeType === 3) { // text node
+            if (node.nodeType === 3) {
                 node.textContent = node.textContent.replace(/\s*\d+\s*$/, '');
             }
         });
-        // Add new count span
         const countSpan = document.createElement("span");
         countSpan.className = "track-count";
         countSpan.textContent = count;
@@ -208,6 +230,8 @@ function init() {
     if (typeof PAPERS_DATA === "undefined") return;
     allPapers = PAPERS_DATA;
     
+    initAlgolia();
+    
     document.querySelectorAll(".track-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".track-btn").forEach(b => b.classList.remove("active"));
@@ -226,7 +250,15 @@ function init() {
         });
     });
     
-    searchInput.addEventListener("input", filterAndRender);
+    // Search only on button click or Enter
+    var searchBtn = document.getElementById("searchBtn");
+    if (searchBtn) {
+        searchBtn.addEventListener("click", doAlgoliaSearch);
+    }
+    searchInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") doAlgoliaSearch();
+    });
+    
     sortSelect.addEventListener("change", filterAndRender);
     
     renderAll();
