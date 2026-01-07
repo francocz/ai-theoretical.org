@@ -9,67 +9,6 @@ let currentView = "full";
 let currentPage = 1;
 const PAPERS_PER_PAGE = 10;
 
-// Algolia configuration
-const ALGOLIA_APP_ID = "KXM87UO2YZ";
-const ALGOLIA_SEARCH_KEY = "9007e1d3d632c25e106acd34be41425c";
-const ALGOLIA_INDEX = "papers";
-let algoliaIndex = null;
-
-function initAlgolia() {
-    if (typeof algoliasearch !== "undefined") {
-        const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY);
-        algoliaIndex = client.initIndex(ALGOLIA_INDEX);
-    }
-}
-
-async function doAlgoliaSearch() {
-    const query = searchInput.value.trim();
-    if (!query || query.length < 2) {
-        filterAndRender();
-        return;
-    }
-    if (!algoliaIndex) {
-        filterAndRender();
-        return;
-    }
-    try {
-        let filters = "";
-        if (currentTrack !== "all") {
-            filters = "track:" + currentTrack;
-        }
-        const results = await algoliaIndex.search(query, {
-            filters: filters,
-            hitsPerPage: 50
-        });
-        // Convert Algolia results to match local format
-        const papers = results.hits.map(h => ({
-            title: h.title,
-            author: h.authors ? h.authors.join(", ") : "",
-            abstract: h.abstract,
-            track: h.track,
-            slug: h.slug,
-            date: h.date,
-            pdf_file: h.pdfUrl || ("papers/" + h.slug + ".pdf"),
-            status: "active"
-        }));
-        renderAlgoliaResults(papers, query, results.nbHits);
-    } catch (error) {
-        console.error("Algolia error:", error);
-        filterAndRender();
-    }
-}
-
-function renderAlgoliaResults(papers, query, total) {
-    currentPage = 1;
-    if (currentView === "full") {
-        renderPapersFull(papers, query);
-    } else {
-        renderPapersCompact(papers, query);
-    }
-    searchStatus.innerHTML = "<strong>" + total + "</strong> result" + (total !== 1 ? "s" : "") + " for \"" + query + "\" <span class=\"clear-search\" onclick=\"clearFilters()\">Clear search</span>";
-}
-
-
 const TRACK_INFO = {
     researchPreprint: { label: "Research Preprint", icon: "📚" },
     workingPaper: { label: "Working Paper", icon: "📝" },
@@ -157,9 +96,9 @@ function renderPapersFull(papers, query) {
             '</div>' +
             '<div class="btn-group">' +
                 '<a href="' + p.pdf_file + '" class="btn btn-black" download>Download PDF</a>' +
-                '<button class="btn btn-white" onclick="toggle('abs-' + i + '')">Abstract</button>' +
-                (p.ai_assessment ? '<button class="btn btn-white" onclick="toggle('ass-' + i + '')">AI Assessment</button>' : '') +
-                (p.notes ? '<button class="btn btn-white" onclick="toggle('notes-' + i + '')">Notes</button>' : '') +
+                '<button class="btn btn-white" onclick="toggle(\'abs-' + i + '\')">Abstract</button>' +
+                (p.ai_assessment ? '<button class="btn btn-white" onclick="toggle(\'ass-' + i + '\')">AI Assessment</button>' : '') +
+                (p.notes ? '<button class="btn btn-white" onclick="toggle(\'notes-' + i + '\')">Notes</button>' : '') +
             '</div>' +
             '<div id="abs-' + i + '" class="abstract-panel">' +
                 '<strong>Abstract:</strong><br><br>' + abstract +
@@ -268,7 +207,6 @@ function toggle(id) {
 function init() {
     if (typeof PAPERS_DATA === "undefined") return;
     allPapers = PAPERS_DATA;
-    initAlgolia();
     
     document.querySelectorAll(".track-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -288,14 +226,7 @@ function init() {
         });
     });
     
-    // Search only on button click or Enter
-    var searchBtn = document.getElementById("searchBtn");
-    if (searchBtn) {
-        searchBtn.addEventListener("click", doAlgoliaSearch);
-    }
-    searchInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") doAlgoliaSearch();
-    });
+    searchInput.addEventListener("input", filterAndRender);
     sortSelect.addEventListener("change", filterAndRender);
     
     renderAll();
