@@ -75,6 +75,7 @@ ATStaticPage >> head [
         s << '    <meta name="description" content="'; << self description; << '">'; << String lf.
         s << '    <meta property="og:title" content="'; << self title; << '">'; << String lf.
         s << '    <meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; << String lf.
+        s << '    <link rel="alternate" type="application/rss+xml" title="AI-Theoretical RSS Feed" href="https://ai-theoretical.org/feed.xml">'; << String lf.
         s << self fonts.
         s << '    <style>'; << String lf.
         s << self css.

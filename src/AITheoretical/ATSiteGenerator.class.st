@@ -70,6 +70,18 @@ ATSiteGenerator >> escapeHtml: aString [
 		copyReplaceAll: '"' with: '&quot;'
 ]
 
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> escapeXml: aString [
+    "Escape caratteri speciali per XML"
+    ^ aString 
+        copyReplaceAll: '&' with: '&amp;';
+        copyReplaceAll: '<' with: '&lt;';
+        copyReplaceAll: '>' with: '&gt;';
+        copyReplaceAll: '"' with: '&quot;';
+        copyReplaceAll: Character cr asString with: ' ';
+        copyReplaceAll: Character lf asString with: ' '
+]
+
 { #category : 'generating' }
 ATSiteGenerator >> generateAll [
 | results |
@@ -82,6 +94,37 @@ results at: 'sitemap' put: self generateSitemap.
 { #category : 'generating' }
 ATSiteGenerator >> generateAllSeoPages [
 ^ repository papers collect: [ :p | self generateSeoPageFor: p ]
+]
+
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> generateRssFeed [
+    "Genera RSS feed per i paper pubblicati"
+    | stream papers |
+    stream := WriteStream on: String new.
+    papers := ATRepository current papers reject: [ :p | p isWithdrawn ].
+    "Ordina per data se presente, altrimenti per titolo"
+    papers := papers sorted: [ :a :b | 
+        (a date isNil and: [ b date isNil ]) 
+            ifTrue: [ a title < b title ]
+            ifFalse: [ 
+                a date ifNil: [ false ] ifNotNil: [ 
+                    b date ifNil: [ true ] ifNotNil: [ a date > b date ] ] ] ].
+    
+    stream nextPutAll: '<?xml version="1.0" encoding="UTF-8"?>'; lf.
+    stream nextPutAll: '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">'; lf.
+    stream nextPutAll: '<channel>'; lf.
+    stream nextPutAll: '<title>AI-Theoretical</title>'; lf.
+    stream nextPutAll: '<link>https://ai-theoretical.org</link>'; lf.
+    stream nextPutAll: '<description>Human-AI co-authored theoretical papers in philosophy, science, and epistemology</description>'; lf.
+    stream nextPutAll: '<language>en</language>'; lf.
+    stream nextPutAll: '<atom:link href="https://ai-theoretical.org/feed.xml" rel="self" type="application/rss+xml"/>'; lf.
+    
+    papers do: [ :paper |
+        self renderRssItem: paper to: stream ].
+    
+    stream nextPutAll: '</channel>'; lf.
+    stream nextPutAll: '</rss>'.
+    ^ stream contents
 ]
 
 { #category : 'generating' }
@@ -317,6 +360,37 @@ ATSiteGenerator >> renderPaperContent: aPaper to: stream [
 	stream nextPutAll: '<footer><div class="powered-by">Powered by <a href="https://www.anthropic.com/claude" target="_blank">Claude AI</a> and <a href="https://pharo.org" target="_blank">Pharo Smalltalk</a></div></footer>'; lf
 ]
 
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> renderRssItem: aPaper to: stream [
+    "Genera un item RSS per un paper"
+    | dateStr truncatedAbstract |
+    
+    dateStr := aPaper date 
+        ifNil: [ '' ] 
+        ifNotNil: [ :d | d asDateAndTime asRFC2822String ].
+    truncatedAbstract := self escapeXml: (self truncateAbstract: (aPaper abstract ifNil: [ '' ])).
+    
+    stream nextPutAll: '<item>'; lf.
+    stream nextPutAll: '<title>'; nextPutAll: (self escapeXml: aPaper title); nextPutAll: '</title>'; lf.
+    stream nextPutAll: '<link>https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html</link>'; lf.
+    stream nextPutAll: '<guid isPermaLink="true">https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html</guid>'; lf.
+    stream nextPutAll: '<description>'; nextPutAll: truncatedAbstract; nextPutAll: '</description>'; lf.
+    
+    dateStr isEmpty ifFalse: [
+        stream nextPutAll: '<pubDate>'; nextPutAll: dateStr; nextPutAll: '</pubDate>'; lf ].
+    
+    "Autori come dc:creator"
+    (aPaper allAuthors isString 
+        ifTrue: [ aPaper allAuthors substrings: ',' ] 
+        ifFalse: [ aPaper allAuthors ]) do: [ :author |
+            stream nextPutAll: '<dc:creator>'; nextPutAll: (self escapeXml: author trimBoth); nextPutAll: '</dc:creator>'; lf ].
+    
+    "Link al PDF come enclosure"
+    stream nextPutAll: '<enclosure url="https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.pdf" type="application/pdf"/>'; lf.
+    
+    stream nextPutAll: '</item>'; lf
+]
+
 { #category : 'accessing' }
 ATSiteGenerator >> repository [
 ^ repository
@@ -369,6 +443,9 @@ ATSiteGenerator >> seoPageForPaper: aPaper [
     
     "Canonical"
     stream nextPutAll: '<link rel="canonical" href="https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html">'; lf.
+    
+    "RSS Feed"
+    stream nextPutAll: '<link rel="alternate" type="application/rss+xml" title="AI-Theoretical RSS Feed" href="https://ai-theoretical.org/feed.xml">'; lf.
     
     "JSON-LD Schema.org"
     stream nextPutAll: '<script type="application/ld+json">'; lf.
