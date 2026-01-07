@@ -508,9 +508,17 @@ gitRepoPath := '/path/to/repo'
 ]
 
 { #category : 'as yet unclassified' }
-ATRepository >> jsBacktickValue: aStringOrNil [
+ATRepository >> jsBacktickValue: aValueOrNil [
     "Formatta un valore per JavaScript usando backticks (per stringhe multilinea)"
-    ^ '`', (self escapeBackticks: (aStringOrNil ifNil: [ '' ])), '`'
+    | str |
+    str := aValueOrNil ifNil: [ '' ] ifNotNil: [ :v |
+        v isString 
+            ifTrue: [ v ]
+            ifFalse: [ 
+                (v respondsTo: #yyyymmdd)
+                    ifTrue: [ v yyyymmdd ]
+                    ifFalse: [ v asString ] ] ].
+    ^ '`', (self escapeBackticks: str), '`'
 ]
 
 { #category : 'as yet unclassified' }

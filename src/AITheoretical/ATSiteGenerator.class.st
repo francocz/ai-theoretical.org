@@ -39,6 +39,24 @@ papersDir exists ifTrue: [
 ^ papersDir
 ]
 
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> dateToRfc2822: aDate [
+    "Converte una Date in formato RFC 2822 per RSS"
+    | weekdays months |
+    "weekdayIndex: 1=Sunday, 2=Monday, 3=Tuesday, 4=Wednesday, 5=Thursday, 6=Friday, 7=Saturday"
+    weekdays := #('Sun' 'Mon' 'Tue' 'Wed' 'Thu' 'Fri' 'Sat').
+    months := #('Jan' 'Feb' 'Mar' 'Apr' 'May' 'Jun' 'Jul' 'Aug' 'Sep' 'Oct' 'Nov' 'Dec').
+    ^ String streamContents: [ :s |
+        s nextPutAll: (weekdays at: aDate weekdayIndex).
+        s nextPutAll: ', '.
+        s nextPutAll: (aDate dayOfMonth printStringLength: 2 padded: true).
+        s nextPut: Character space.
+        s nextPutAll: (months at: aDate monthIndex).
+        s nextPut: Character space.
+        s nextPutAll: aDate year printString.
+        s nextPutAll: ' 00:00:00 +0000' ]
+]
+
 { #category : 'defaults' }
 ATSiteGenerator >> defaultStaticPages [
     "Pagine statiche di default per ai-theoretical.org"
@@ -141,30 +159,45 @@ ATSiteGenerator >> generateSeoPageFor: aPaper [
 
 { #category : 'generating' }
 ATSiteGenerator >> generateSitemap [
-    "Genera sitemap.xml con pagine statiche + SEO dei paper attivi"
-    | stream baseUrl activePapers file |
-    baseUrl := 'https://ai-theoretical.org'.
-    activePapers := self activePapers.
+    "Genera sitemap.xml con lastmod per ogni pagina"
+    | stream today papers |
     stream := WriteStream on: String new.
-    stream nextPutAll: '<?xml version="1.0" encoding="UTF-8"?>'; cr.
-    stream nextPutAll: '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'; cr.
+    today := Date today yyyymmdd.
+    papers := ATRepository current papers reject: [ :p | p isWithdrawn ].
+    
+    stream nextPutAll: '<?xml version="1.0" encoding="UTF-8"?>'; lf.
+    stream nextPutAll: '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'; lf.
+    
     "Pagine statiche"
-    self staticPages do: [ :page |
-        stream nextPutAll: '<url><loc>'.
-        stream nextPutAll: baseUrl; nextPutAll: '/'.
-        stream nextPutAll: (page = 'index.html' ifTrue: [ '' ] ifFalse: [ page ]).
-        stream nextPutAll: '</loc></url>'; cr ].
-    "Solo paper attivi"
-    activePapers do: [ :paper |
-        stream nextPutAll: '<url><loc>'.
-        stream nextPutAll: baseUrl; nextPutAll: '/papers/'; nextPutAll: paper slug; nextPutAll: '.html'.
-        stream nextPutAll: '</loc></url>'; cr ].
+    #(
+        '' 
+        'manifesto.html' 
+        'editorial-principles.html' 
+        'ai-editorial-prompt.html' 
+        'invite.html' 
+        'submit.html'
+        'submit-form.html'
+        'author-access.html'
+    ) do: [ :page |
+        stream nextPutAll: '<url>'.
+        stream nextPutAll: '<loc>https://ai-theoretical.org/'; nextPutAll: page; nextPutAll: '</loc>'.
+        stream nextPutAll: '<lastmod>'; nextPutAll: today; nextPutAll: '</lastmod>'.
+        stream nextPutAll: '</url>'; lf ].
+    
+    "Pagine paper"
+    papers do: [ :paper |
+        | lastmod |
+        lastmod := paper date 
+            ifNil: [ today ] 
+            ifNotNil: [ :d | d yyyymmdd ].
+        stream nextPutAll: '<url>'.
+        stream nextPutAll: '<loc>https://ai-theoretical.org/papers/'; nextPutAll: paper slug; nextPutAll: '.html</loc>'.
+        stream nextPutAll: '<lastmod>'; nextPutAll: lastmod; nextPutAll: '</lastmod>'.
+        stream nextPutAll: '<priority>0.8</priority>'.
+        stream nextPutAll: '</url>'; lf ].
+    
     stream nextPutAll: '</urlset>'.
-    file := outputPath asFileReference / 'sitemap.xml'.
-    file ensureDelete.
-    file writeStreamDo: [ :f |
-        f nextPutAll: stream contents ].
-    ^ self staticPages size + activePapers size
+    ^ stream contents
 ]
 
 { #category : 'as yet unclassified' }
@@ -367,7 +400,7 @@ ATSiteGenerator >> renderRssItem: aPaper to: stream [
     
     dateStr := aPaper date 
         ifNil: [ '' ] 
-        ifNotNil: [ :d | d asDateAndTime asRFC2822String ].
+        ifNotNil: [ :d | self dateToRfc2822: d ].
     truncatedAbstract := self escapeXml: (self truncateAbstract: (aPaper abstract ifNil: [ '' ])).
     
     stream nextPutAll: '<item>'; lf.

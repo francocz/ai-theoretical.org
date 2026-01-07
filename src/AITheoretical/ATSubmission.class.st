@@ -29,7 +29,7 @@ Class {
 
 { #category : 'instance creation' }
 ATSubmission class >> fromDictionary: aDict [
-    | submission statusStr trackStr |
+    | submission statusStr trackStr submittedStr |
     submission := self new
         id: (aDict at: 'id' ifAbsent: [ nil ]);
         paperToken: (aDict at: 'paperToken' ifAbsent: [ nil ]);
@@ -50,6 +50,11 @@ ATSubmission class >> fromDictionary: aDict [
     submission status: statusStr asSymbol.
     trackStr := aDict at: 'track' ifAbsent: [ 'workingPaper' ].
     submission track: trackStr asSymbol.
+    "Parse submittedAt se presente"
+    submittedStr := aDict at: 'submittedAt' ifAbsent: [ nil ].
+    submittedStr ifNotNil: [
+        [ submission submittedAt: (DateAndTime fromString: submittedStr) ]
+            on: Error do: [ :e | "Ignora errori di parsing" ] ].
     ^ submission
 ]
 
@@ -99,7 +104,7 @@ ATSubmission >> asDictionary [
 { #category : 'converting' }
 ATSubmission >> asPaper [
     "Crea un ATPaper da questa submission. Usare solo dopo accettazione."
-    | paper authorDisplay |
+    | paper authorDisplay pubDate |
     
     "Costruisco la stringa authors completa"
     authorDisplay := authorName.
@@ -108,12 +113,18 @@ ATSubmission >> asPaper [
     (coAuthors notNil and: [ coAuthors notEmpty ]) ifTrue: [
         authorDisplay := authorDisplay, ', ', coAuthors ].
     
+    "Data di pubblicazione: usa submittedAt o today come fallback"
+    pubDate := submittedAt 
+        ifNil: [ Date today ] 
+        ifNotNil: [ :dt | dt asDate ].
+    
     paper := ATPaper new
         title: title;
         authors: authorDisplay;
         aiModels: aiModels;
         abstract: abstract;
         track: self track;
+        date: pubDate;
         generateSlug;
         yourself.
     ^ paper
