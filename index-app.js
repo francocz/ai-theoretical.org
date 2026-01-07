@@ -22,16 +22,45 @@ function initAlgolia() {
 
 function doAlgoliaSearch() {
     var query = searchInput.value.trim();
-    if (!query || !algoliaIndex) { filterAndRender(); return; }
+    
+    // If empty query, reset to normal view
+    if (!query) { 
+        filterAndRender(); 
+        return; 
+    }
+    
+    // Minimum 3 characters
+    if (query.length < 3) {
+        filterAndRender();
+        return;
+    }
+    
+    if (!algoliaIndex) { 
+        filterAndRender(); 
+        return; 
+    }
+    
     var filters = currentTrack !== "all" ? "track:" + currentTrack : "";
     algoliaIndex.search(query, { filters: filters, hitsPerPage: 50 }).then(function(results) {
-        var papers = results.hits.map(function(h) {
-            return { title: h.title, author: h.authors ? h.authors.join(", ") : "", abstract: h.abstract, track: h.track, slug: h.slug, date: h.date, pdf_file: "papers/" + h.slug + ".pdf", status: "active", ai_model: h.aiModels || "" };
+        // Map Algolia results back to local papers to get full data (ai_assessment, notes, etc)
+        var papers = [];
+        results.hits.forEach(function(h) {
+            var localPaper = allPapers.find(function(p) { return p.slug === h.slug; });
+            if (localPaper && localPaper.status === "active") {
+                papers.push(localPaper);
+            }
         });
+        
         currentPage = 1;
-        if (currentView === "full") { renderPapersFull(papers, query); } else { renderPapersCompact(papers, query); }
-        searchStatus.innerHTML = "<strong>" + results.nbHits + "</strong> results for \"" + query + "\" <span class=\"clear-search\" onclick=\"clearFilters()\">Clear</span>";
-    }).catch(function() { filterAndRender(); });
+        if (currentView === "full") { 
+            renderPapersFull(papers, query); 
+        } else { 
+            renderPapersCompact(papers, query); 
+        }
+        searchStatus.innerHTML = "<strong>" + papers.length + "</strong> result" + (papers.length !== 1 ? "s" : "") + " for \"" + query + "\"";
+    }).catch(function() { 
+        filterAndRender(); 
+    });
 }
 
 const TRACK_INFO = {
@@ -182,9 +211,10 @@ function goToPage(page) {
 }
 
 function updateStatus(shown, total) {
-    const hasFilters = searchInput.value || currentTrack !== "all";
+    const query = searchInput.value.trim();
+    const hasFilters = query || currentTrack !== "all";
     if (hasFilters) {
-        searchStatus.innerHTML = 'Showing <strong>' + shown + '</strong> of ' + total + ' papers <span class="clear-search" onclick="clearFilters()">Clear filters</span>';
+        searchStatus.innerHTML = 'Showing <strong>' + shown + '</strong> of ' + total + ' papers';
     } else {
         searchStatus.innerHTML = '<strong>' + total + '</strong> papers published';
     }
@@ -237,7 +267,12 @@ function init() {
             document.querySelectorAll(".track-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             currentTrack = btn.dataset.track;
-            filterAndRender();
+            // If there's a search query, re-run Algolia search with new track filter
+            if (searchInput.value.trim().length >= 3) {
+                doAlgoliaSearch();
+            } else {
+                filterAndRender();
+            }
         });
     });
     
@@ -250,13 +285,16 @@ function init() {
         });
     });
     
-    // Search only on button click or Enter
-    var searchBtn = document.getElementById("searchBtn");
-    if (searchBtn) {
-        searchBtn.addEventListener("click", doAlgoliaSearch);
-    }
+    // Search on Enter
     searchInput.addEventListener("keypress", function(e) {
         if (e.key === "Enter") doAlgoliaSearch();
+    });
+    
+    // Reset when clearing the search field
+    searchInput.addEventListener("input", function() {
+        if (searchInput.value.trim() === "") {
+            filterAndRender();
+        }
     });
     
     sortSelect.addEventListener("change", filterAndRender);
