@@ -157,9 +157,9 @@ function renderPapersFull(papers, query) {
             '</div>' +
             '<div class="btn-group">' +
                 '<a href="' + p.pdf_file + '" class="btn btn-black" download>Download PDF</a>' +
-                '<button class="btn btn-white" onclick="toggle(\'abs-' + i + '\')">Abstract</button>' +
-                (p.ai_assessment ? '<button class="btn btn-white" onclick="toggle(\'ass-' + i + '\')">AI Assessment</button>' : '') +
-                (p.notes ? '<button class="btn btn-white" onclick="toggle(\'notes-' + i + '\')">Notes</button>' : '') +
+                '<button class="btn btn-white" onclick="toggle('abs-' + i + '')">Abstract</button>' +
+                (p.ai_assessment ? '<button class="btn btn-white" onclick="toggle('ass-' + i + '')">AI Assessment</button>' : '') +
+                (p.notes ? '<button class="btn btn-white" onclick="toggle('notes-' + i + '')">Notes</button>' : '') +
             '</div>' +
             '<div id="abs-' + i + '" class="abstract-panel">' +
                 '<strong>Abstract:</strong><br><br>' + abstract +
