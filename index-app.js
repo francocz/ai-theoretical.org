@@ -1,6 +1,5 @@
 const repo = document.getElementById("repository");
 const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
 const searchStatus = document.getElementById("searchStatus");
 const sortSelect = document.getElementById("sortSelect");
 
@@ -10,17 +9,11 @@ let currentView = "full";
 let currentPage = 1;
 const PAPERS_PER_PAGE = 10;
 
+// Algolia configuration
 const ALGOLIA_APP_ID = "KXM87UO2YZ";
 const ALGOLIA_SEARCH_KEY = "9007e1d3d632c25e106acd34be41425c";
 const ALGOLIA_INDEX = "papers";
 let algoliaIndex = null;
-
-const TRACK_INFO = {
-    researchPreprint: { label: "Research Preprint", icon: "📚" },
-    workingPaper: { label: "Working Paper", icon: "📝" },
-    expositoryEssay: { label: "Expository Essay", icon: "📖" },
-    criticalReview: { label: "Critical Review", icon: "🔍" }
-};
 
 function initAlgolia() {
     if (typeof algoliasearch !== "undefined") {
@@ -29,45 +22,14 @@ function initAlgolia() {
     }
 }
 
-function highlightText(text, query) {
-    if (!query || !text) return text;
-    const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-    if (words.length === 0) return text;
-    const regex = new RegExp("(" + words.join("|") + ")", "gi");
-    return text.replace(regex, "<span class=\"highlight\">$1</span>");
-}
-
-function getActivePapers() {
-    return allPapers.filter(p => p.status === "active");
-}
-
-function getFilteredPapers() {
-    let filtered = getActivePapers();
-    if (currentTrack !== "all") {
-        filtered = filtered.filter(p => p.track === currentTrack);
-    }
-    return sortPapers(filtered);
-}
-
-function sortPapers(papers) {
-    const sort = sortSelect.value;
-    return [...papers].sort((a, b) => {
-        if (sort === "date-desc") return (b.date || "").localeCompare(a.date || "");
-        if (sort === "date-asc") return (a.date || "").localeCompare(b.date || "");
-        if (sort === "title-asc") return a.title.localeCompare(b.title);
-        if (sort === "title-desc") return b.title.localeCompare(a.title);
-        return 0;
-    });
-}
-
-async function doSearch() {
+async function doAlgoliaSearch() {
     const query = searchInput.value.trim();
-    if (!query) {
-        renderAll();
+    if (!query || query.length < 2) {
+        filterAndRender();
         return;
     }
     if (!algoliaIndex) {
-        localSearch(query);
+        filterAndRender();
         return;
     }
     try {
@@ -79,53 +41,98 @@ async function doSearch() {
             filters: filters,
             hitsPerPage: 50
         });
-        renderSearchResults(results.hits, query);
+        // Convert Algolia results to match local format
+        const papers = results.hits.map(h => ({
+            title: h.title,
+            author: h.authors ? h.authors.join(", ") : "",
+            abstract: h.abstract,
+            track: h.track,
+            slug: h.slug,
+            date: h.date,
+            pdf_file: h.pdfUrl || ("papers/" + h.slug + ".pdf"),
+            status: "active"
+        }));
+        renderAlgoliaResults(papers, query, results.nbHits);
     } catch (error) {
         console.error("Algolia error:", error);
-        localSearch(query);
+        filterAndRender();
     }
 }
 
-function localSearch(query) {
-    const q = query.toLowerCase();
-    const words = q.split(/\s+/).filter(w => w.length > 0);
-    let filtered = getActivePapers().filter(p => {
-        const searchable = (p.title + " " + p.author + " " + (p.abstract || "")).toLowerCase();
-        return words.every(word => searchable.includes(word));
-    });
-    if (currentTrack !== "all") {
-        filtered = filtered.filter(p => p.track === currentTrack);
-    }
-    renderSearchResults(sortPapers(filtered), query);
-}
-
-function renderSearchResults(papers, query) {
+function renderAlgoliaResults(papers, query, total) {
     currentPage = 1;
     if (currentView === "full") {
         renderPapersFull(papers, query);
     } else {
         renderPapersCompact(papers, query);
     }
-    updateSearchStatus(papers.length, query);
+    searchStatus.innerHTML = "<strong>" + total + "</strong> result" + (total !== 1 ? "s" : "") + " for \"" + query + "\" <span class=\"clear-search\" onclick=\"clearFilters()\">Clear search</span>";
+}
+
+
+const TRACK_INFO = {
+    researchPreprint: { label: "Research Preprint", icon: "📚" },
+    workingPaper: { label: "Working Paper", icon: "📝" },
+    expositoryEssay: { label: "Expository Essay", icon: "📖" },
+    criticalReview: { label: "Critical Review", icon: "🔍" }
+};
+
+function highlightText(text, query) {
+    if (!query || !text) return text;
+    const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    if (words.length === 0) return text;
+    const regex = new RegExp("(" + words.join("|") + ")", "gi");
+    return text.replace(regex, '<span class="highlight">$1</span>');
+}
+
+function matchesPaper(paper, query) {
+    if (!query) return true;
+    const q = query.toLowerCase();
+    const words = q.split(/\s+/).filter(w => w.length > 0);
+    const searchable = (paper.title + " " + paper.author + " " + (paper.abstract || "") + " " + (paper.ai_model || "")).toLowerCase();
+    return words.every(word => searchable.includes(word));
+}
+
+function getActivePapers() {
+    return allPapers.filter(p => p.status === "active");
+}
+
+function getFilteredPapers() {
+    const query = searchInput.value.trim();
+    let filtered = getActivePapers().filter(p => {
+        if (!matchesPaper(p, query)) return false;
+        if (currentTrack !== "all" && p.track !== currentTrack) return false;
+        return true;
+    });
+    return sortPapers(filtered);
+}
+
+function sortPapers(papers) {
+    const sort = sortSelect.value;
+    return papers.sort((a, b) => {
+        if (sort === "date-desc") return (b.date || "").localeCompare(a.date || "");
+        if (sort === "date-asc") return (a.date || "").localeCompare(b.date || "");
+        if (sort === "title-asc") return a.title.localeCompare(b.title);
+        if (sort === "title-desc") return b.title.localeCompare(a.title);
+        return 0;
+    });
 }
 
 function filterAndRender() {
     currentPage = 1;
-    const query = searchInput.value.trim();
-    if (query) {
-        doSearch();
-    } else {
-        renderAll();
-    }
+    renderAll();
 }
 
 function renderAll() {
     const filtered = getFilteredPapers();
+    const query = searchInput.value.trim();
+    
     if (currentView === "full") {
-        renderPapersFull(filtered, "");
+        renderPapersFull(filtered, query);
     } else {
-        renderPapersCompact(filtered, "");
+        renderPapersCompact(filtered, query);
     }
+    
     updateStatus(filtered.length, getActivePapers().length);
     updateTrackCounts();
 }
@@ -137,30 +144,29 @@ function renderPapersFull(papers, query) {
     let html = pageItems.map((p, idx) => {
         const i = start + idx;
         const title = highlightText(p.title, query);
-        const author = highlightText(p.author || (p.authors ? p.authors.join(", ") : ""), query);
+        const author = highlightText(p.author, query);
         const abstract = highlightText(p.abstract, query);
         const trackInfo = TRACK_INFO[p.track] || { label: "Paper", icon: "📄" };
-        const pdfFile = p.pdf_file || ("papers/" + p.slug + ".pdf");
-        const aiModel = p.ai_model || p.aiModels || "";
         
-        return `<article class="paper-entry">
-            <div class="paper-track-badge track-${p.track}">${trackInfo.icon} ${trackInfo.label}</div>
-            <h2 class="paper-title">${title}</h2>
-            <div class="paper-meta">
-                By <strong>${author}</strong>${aiModel ? " · <span class=\"ai-tag\">" + aiModel + "</span>" : ""}${p.date ? " · " + p.date : ""}${p.pages ? " · " + p.pages + " pages" : ""}
-            </div>
-            <div class="btn-group">
-                <a href="${pdfFile}" class="btn btn-black" download>Download PDF</a>
-                <button class="btn btn-white" onclick="toggle(${"`"}abs-${i}${"`"})">Abstract</button>
-                ${p.ai_assessment ? `<button class="btn btn-white" onclick="toggle(${"`"}ass-${i}${"`"})">AI Assessment</button>` : ""}
-                ${p.notes ? `<button class="btn btn-white" onclick="toggle(${"`"}notes-${i}${"`"})">Notes</button>` : ""}
-            </div>
-            <div id="abs-${i}" class="abstract-panel">
-                <strong>Abstract:</strong><br><br>${abstract}
-            </div>
-            ${p.ai_assessment ? `<div id="ass-${i}" class="abstract-panel"><strong>AI Editorial Assessment:</strong><br><br><pre style="white-space: pre-wrap; font-family: inherit;">${p.ai_assessment}</pre></div>` : ""}
-            ${p.notes ? `<div id="notes-${i}" class="abstract-panel"><strong>Notes on AI Collaboration:</strong><br><br><pre style="white-space: pre-wrap; font-family: inherit;">${p.notes}</pre></div>` : ""}
-        </article>`;
+        return '<article class="paper-entry">' +
+            '<div class="paper-track-badge track-' + p.track + '">' + trackInfo.icon + ' ' + trackInfo.label + '</div>' +
+            '<h2 class="paper-title">' + title + '</h2>' +
+            '<div class="paper-meta">' +
+                'By <strong>' + author + '</strong> · <span class="ai-tag">' + p.ai_model + '</span>' + 
+                (p.date ? ' · ' + p.date : '') + (p.pages ? ' · ' + p.pages + ' pages' : '') +
+            '</div>' +
+            '<div class="btn-group">' +
+                '<a href="' + p.pdf_file + '" class="btn btn-black" download>Download PDF</a>' +
+                '<button class="btn btn-white" onclick="toggle(\'abs-' + i + '\')">Abstract</button>' +
+                (p.ai_assessment ? '<button class="btn btn-white" onclick="toggle(\'ass-' + i + '\')">AI Assessment</button>' : '') +
+                (p.notes ? '<button class="btn btn-white" onclick="toggle(\'notes-' + i + '\')">Notes</button>' : '') +
+            '</div>' +
+            '<div id="abs-' + i + '" class="abstract-panel">' +
+                '<strong>Abstract:</strong><br><br>' + abstract +
+            '</div>' +
+            (p.ai_assessment ? '<div id="ass-' + i + '" class="abstract-panel"><strong>AI Editorial Assessment:</strong><br><br><pre style="white-space: pre-wrap; font-family: inherit;">' + p.ai_assessment + '</pre></div>' : '') +
+            (p.notes ? '<div id="notes-' + i + '" class="abstract-panel"><strong>Notes on AI Collaboration:</strong><br><br><pre style="white-space: pre-wrap; font-family: inherit;">' + p.notes + '</pre></div>' : '') +
+        '</article>';
     }).join("");
     
     html += renderPagination(papers.length);
@@ -171,21 +177,19 @@ function renderPapersCompact(papers, query) {
     const start = (currentPage - 1) * PAPERS_PER_PAGE;
     const pageItems = papers.slice(start, start + PAPERS_PER_PAGE);
     
-    let html = "<div class=\"compact-list\">";
+    let html = '<div class="compact-list">';
     html += pageItems.map(p => {
         const title = highlightText(p.title, query);
         const trackInfo = TRACK_INFO[p.track] || { label: "Paper", icon: "📄" };
-        const pdfFile = p.pdf_file || ("papers/" + p.slug + ".pdf");
-        const author = p.author || (p.authors ? p.authors.join(", ") : "");
         
-        return `<div class="compact-item">
-            <span class="compact-track track-${p.track}">${trackInfo.icon}</span>
-            <a href="${pdfFile}" class="compact-title" download>${title}</a>
-            <span class="compact-author">${author}</span>
-            <span class="compact-date">${p.date || ""}</span>
-        </div>`;
+        return '<div class="compact-item">' +
+            '<span class="compact-track track-' + p.track + '">' + trackInfo.icon + '</span>' +
+            '<a href="' + p.pdf_file + '" class="compact-title" download>' + title + '</a>' +
+            '<span class="compact-author">' + p.author + '</span>' +
+            '<span class="compact-date">' + (p.date || "") + '</span>' +
+        '</div>';
     }).join("");
-    html += "</div>";
+    html += '</div>';
     
     html += renderPagination(papers.length);
     repo.innerHTML = html;
@@ -195,40 +199,31 @@ function renderPagination(total) {
     const totalPages = Math.ceil(total / PAPERS_PER_PAGE);
     if (totalPages <= 1) return "";
     
-    let html = "<div class=\"pagination\">";
+    let html = '<div class="pagination">';
     if (currentPage > 1) {
-        html += `<button onclick="goToPage(${currentPage - 1})">← Prev</button>`;
+        html += '<button onclick="goToPage(' + (currentPage - 1) + ')">← Prev</button>';
     }
-    html += `<span class="page-info">Page ${currentPage} of ${totalPages}</span>`;
+    html += '<span class="page-info">Page ' + currentPage + ' of ' + totalPages + '</span>';
     if (currentPage < totalPages) {
-        html += `<button onclick="goToPage(${currentPage + 1})">Next →</button>`;
+        html += '<button onclick="goToPage(' + (currentPage + 1) + ')">Next →</button>';
     }
-    html += "</div>";
+    html += '</div>';
     return html;
 }
 
 function goToPage(page) {
     currentPage = page;
-    const query = searchInput.value.trim();
-    if (query) {
-        doSearch();
-    } else {
-        renderAll();
-    }
+    renderAll();
     repo.scrollIntoView({ behavior: "smooth" });
 }
 
 function updateStatus(shown, total) {
-    const hasFilters = currentTrack !== "all";
+    const hasFilters = searchInput.value || currentTrack !== "all";
     if (hasFilters) {
-        searchStatus.innerHTML = `Showing <strong>${shown}</strong> of ${total} papers <span class="clear-search" onclick="clearFilters()">Clear filters</span>`;
+        searchStatus.innerHTML = 'Showing <strong>' + shown + '</strong> of ' + total + ' papers <span class="clear-search" onclick="clearFilters()">Clear filters</span>';
     } else {
-        searchStatus.innerHTML = `<strong>${total}</strong> papers published`;
+        searchStatus.innerHTML = '<strong>' + total + '</strong> papers published';
     }
-}
-
-function updateSearchStatus(count, query) {
-    searchStatus.innerHTML = `<strong>${count}</strong> result${count !== 1 ? "s" : ""} for "${query}" <span class="clear-search" onclick="clearFilters()">Clear search</span>`;
 }
 
 function updateTrackCounts() {
@@ -241,13 +236,16 @@ function updateTrackCounts() {
         } else {
             count = activePapers.filter(p => p.track === track).length;
         }
+        // Remove old count span
         const existing = btn.querySelector(".track-count");
         if (existing) existing.remove();
+        // Remove old text count if any
         btn.childNodes.forEach(node => {
-            if (node.nodeType === 3) {
-                node.textContent = node.textContent.replace(/\s*\d+\s*$/, "");
+            if (node.nodeType === 3) { // text node
+                node.textContent = node.textContent.replace(/\s*\d+\s*$/, '');
             }
         });
+        // Add new count span
         const countSpan = document.createElement("span");
         countSpan.className = "track-count";
         countSpan.textContent = count;
@@ -259,8 +257,8 @@ function clearFilters() {
     searchInput.value = "";
     currentTrack = "all";
     document.querySelectorAll(".track-btn").forEach(b => b.classList.remove("active"));
-    document.querySelector(".track-btn[data-track=\"all\"]").classList.add("active");
-    renderAll();
+    document.querySelector('.track-btn[data-track="all"]').classList.add("active");
+    filterAndRender();
 }
 
 function toggle(id) { 
@@ -270,7 +268,6 @@ function toggle(id) {
 function init() {
     if (typeof PAPERS_DATA === "undefined") return;
     allPapers = PAPERS_DATA;
-    
     initAlgolia();
     
     document.querySelectorAll(".track-btn").forEach(btn => {
@@ -287,15 +284,18 @@ function init() {
             document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             currentView = btn.dataset.view;
-            filterAndRender();
+            renderAll();
         });
     });
     
-    searchBtn.addEventListener("click", doSearch);
-    searchInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") doSearch();
+    // Search only on button click or Enter
+    var searchBtn = document.getElementById("searchBtn");
+    if (searchBtn) {
+        searchBtn.addEventListener("click", doAlgoliaSearch);
+    }
+    searchInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") doAlgoliaSearch();
     });
-    
     sortSelect.addEventListener("change", filterAndRender);
     
     renderAll();
