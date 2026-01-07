@@ -124,6 +124,110 @@ ATSiteGenerator >> generateSitemap [
     ^ self staticPages size + activePapers size
 ]
 
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> googleScholarMetaTagsForPaper: aPaper to: stream [
+    "Genera meta tags specifici per Google Scholar"
+    | dateStr authors |
+    
+    dateStr := aPaper date 
+        ifNil: [ '' ] 
+        ifNotNil: [ :d | d yyyymmdd ].
+    
+    "citation_title"
+    stream nextPutAll: '<meta name="citation_title" content="'.
+    stream nextPutAll: (self escapeHtml: aPaper title).
+    stream nextPutAll: '">' ; lf.
+    
+    "citation_author - uno per autore"
+    authors := aPaper allAuthors.
+    (authors isString 
+        ifTrue: [ authors substrings: ',' ] 
+        ifFalse: [ authors ]) do: [ :author |
+            stream nextPutAll: '<meta name="citation_author" content="'.
+            stream nextPutAll: (self escapeHtml: author trimBoth).
+            stream nextPutAll: '">' ; lf ].
+    
+    "citation_publication_date"
+    dateStr isEmpty ifFalse: [
+        stream nextPutAll: '<meta name="citation_publication_date" content="'.
+        stream nextPutAll: dateStr.
+        stream nextPutAll: '">' ; lf ].
+    
+    "citation_pdf_url"
+    stream nextPutAll: '<meta name="citation_pdf_url" content="https://ai-theoretical.org/papers/'.
+    stream nextPutAll: aPaper slug.
+    stream nextPutAll: '.pdf">' ; lf.
+    
+    "citation_abstract_html_url"
+    stream nextPutAll: '<meta name="citation_abstract_html_url" content="https://ai-theoretical.org/papers/'.
+    stream nextPutAll: aPaper slug.
+    stream nextPutAll: '.html">' ; lf.
+    
+    "citation_publisher"
+    stream nextPutAll: '<meta name="citation_publisher" content="AI-Theoretical">' ; lf
+]
+
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> jsonLdForPaper: aPaper [
+    "Genera JSON-LD Schema.org per un paper accademico"
+    | dict authorsList dateStr pdfUrl pageUrl |
+    
+    dateStr := aPaper date 
+        ifNil: [ '' ] 
+        ifNotNil: [ :d | d yyyymmdd ].
+    
+    pdfUrl := 'https://ai-theoretical.org/papers/', aPaper slug, '.pdf'.
+    pageUrl := 'https://ai-theoretical.org/papers/', aPaper slug, '.html'.
+    
+    "Costruisce lista autori - gestisce sia Array che String"
+    authorsList := aPaper allAuthors.
+    authorsList := (authorsList isString 
+        ifTrue: [ authorsList substrings: ',' ] 
+        ifFalse: [ authorsList ]) collect: [ :name |
+            Dictionary new
+                at: '@type' put: 'Person';
+                at: 'name' put: name trimBoth;
+                yourself ].
+    
+    dict := Dictionary new.
+    dict at: '@context' put: 'https://schema.org'.
+    dict at: '@type' put: 'ScholarlyArticle'.
+    dict at: 'headline' put: aPaper title.
+    dict at: 'name' put: aPaper title.
+    dict at: 'author' put: authorsList asArray.
+    dict at: 'datePublished' put: dateStr.
+    dict at: 'abstract' put: (aPaper abstract ifNil: [ '' ]).
+    dict at: 'url' put: pageUrl.
+    
+    "Publisher"
+    dict at: 'publisher' put: (Dictionary new
+        at: '@type' put: 'Organization';
+        at: 'name' put: 'AI-Theoretical';
+        at: 'url' put: 'https://ai-theoretical.org';
+        yourself).
+    
+    "PDF come encoding"
+    dict at: 'encoding' put: (Dictionary new
+        at: '@type' put: 'MediaObject';
+        at: 'contentUrl' put: pdfUrl;
+        at: 'encodingFormat' put: 'application/pdf';
+        yourself).
+    
+    "Track come genre"
+    aPaper track ifNotNil: [ :t |
+        dict at: 'genre' put: t ].
+    
+    "AI models usati"
+    aPaper aiModels ifNotNil: [ :models |
+        models isEmpty ifFalse: [
+            dict at: 'funder' put: (Dictionary new
+                at: '@type' put: 'Organization';
+                at: 'name' put: 'AI Models: ', models;
+                yourself) ] ].
+    
+    ^ NeoJSONWriter toStringPretty: dict
+]
+
 { #category : 'accessing' }
 ATSiteGenerator >> outputPath [
 ^ outputPath
@@ -225,7 +329,7 @@ repository := aRepo
 
 { #category : 'generating' }
 ATSiteGenerator >> seoPageForPaper: aPaper [
-    "Genera pagina HTML completa per un paper con meta tags SEO/OG"
+    "Genera pagina HTML completa per un paper con meta tags SEO/OG/Schema.org"
     | stream abstract dateStr truncatedAbstract |
     stream := WriteStream on: String new.
     abstract := aPaper abstract ifNil: [ '' ].
@@ -250,6 +354,9 @@ ATSiteGenerator >> seoPageForPaper: aPaper [
     stream nextPutAll: '<meta name="description" content="'; nextPutAll: (self escapeHtml: truncatedAbstract); nextPutAll: '">'; lf.
     stream nextPutAll: '<meta name="keywords" content="AI, theoretical papers, human-AI collaboration, '; nextPutAll: (self escapeHtml: aPaper authors); nextPutAll: '">'; lf.
     
+    "Google Scholar meta tags"
+    self googleScholarMetaTagsForPaper: aPaper to: stream.
+    
     "Open Graph"
     stream nextPutAll: '<meta property="og:title" content="'; nextPutAll: (self escapeHtml: aPaper title); nextPutAll: ' — AI-Theoretical">'; lf.
     stream nextPutAll: '<meta property="og:description" content="'; nextPutAll: (self escapeHtml: truncatedAbstract); nextPutAll: '">'; lf.
@@ -257,8 +364,16 @@ ATSiteGenerator >> seoPageForPaper: aPaper [
     stream nextPutAll: '<meta property="og:type" content="article">'; lf.
     stream nextPutAll: '<meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; lf.
     
+    "Twitter Cards"
+    self twitterCardsForPaper: aPaper to: stream.
+    
     "Canonical"
     stream nextPutAll: '<link rel="canonical" href="https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html">'; lf.
+    
+    "JSON-LD Schema.org"
+    stream nextPutAll: '<script type="application/ld+json">'; lf.
+    stream nextPutAll: (self jsonLdForPaper: aPaper).
+    stream nextPutAll: '</script>'; lf.
     
     "Fonts and CSS"
     stream nextPutAll: '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">'; lf.
@@ -291,4 +406,22 @@ ATSiteGenerator >> truncateAbstract: aString [
 	^ clean size > 160
 		ifTrue: [ (clean copyFrom: 1 to: 157), '...' ]
 		ifFalse: [ clean ]
+]
+
+{ #category : 'as yet unclassified' }
+ATSiteGenerator >> twitterCardsForPaper: aPaper to: stream [
+    "Genera meta tags per Twitter Cards"
+    | truncatedAbstract |
+    
+    truncatedAbstract := self truncateAbstract: (aPaper abstract ifNil: [ '' ]).
+    
+    stream nextPutAll: '<meta name="twitter:card" content="summary_large_image">' ; lf.
+    stream nextPutAll: '<meta name="twitter:site" content="@AITheoretical">' ; lf.
+    stream nextPutAll: '<meta name="twitter:title" content="'.
+    stream nextPutAll: (self escapeHtml: aPaper title).
+    stream nextPutAll: '">' ; lf.
+    stream nextPutAll: '<meta name="twitter:description" content="'.
+    stream nextPutAll: (self escapeHtml: truncatedAbstract).
+    stream nextPutAll: '">' ; lf.
+    stream nextPutAll: '<meta name="twitter:image" content="https://ai-theoretical.org/og-image.jpg">' ; lf
 ]
