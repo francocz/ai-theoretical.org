@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+<title>AI-Theoretical</title>
+<link>https://ai-theoretical.org</link>
+<description>Human-AI co-authored theoretical papers in philosophy, science, and epistemology</description>
+<language>en</language>
+<atom:link href="https://ai-theoretical.org/feed.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>Image-Based Development with LLM Agents: Building ai-theoretical.org in 72 Hours</title>
+<link>https://ai-theoretical.org/papers/image-based-development-with-llm-agents.html</link>
+<guid isPermaLink="true">https://ai-theoretical.org/papers/image-based-development-with-llm-agents.html</guid>
+<description>This paper documents the development of ai-theoretical.org, an automated academic preprint repository, built through direct collaboration between a human and...</description>
+<dc:creator>Franco Cazzaniga</dc:creator>
+<dc:creator>Claude</dc:creator>
+<enclosure url="https://ai-theoretical.org/papers/image-based-development-with-llm-agents.pdf" type="application/pdf"/>
+</item>
+<item>
+<title>The Invisible Pillar On the Genesis and Concealment of Dualism from the Pre-Socratics to the Moderns</title>
+<link>https://ai-theoretical.org/papers/the-invisible-pillar-on-the.html</link>
+<guid isPermaLink="true">https://ai-theoretical.org/papers/the-invisible-pillar-on-the.html</guid>
+<description>This paper traces the genealogy of the dualism between intelligible and sensible, between logos and matter, from its pre-Socratic background through its Plat...</description>
+<dc:creator>Franco Cazzaniga</dc:creator>
+<enclosure url="https://ai-theoretical.org/papers/the-invisible-pillar-on-the.pdf" type="application/pdf"/>
+</item>
+<item>
+<title>The Invisible Wealth: Mismeasurement of Quality, the Myth of Stagnation, and the Underestimation of Real Income Growth</title>
+<link>https://ai-theoretical.org/papers/the-invisible-wealth-mismeasurement-of.html</link>
+<guid isPermaLink="true">https://ai-theoretical.org/papers/the-invisible-wealth-mismeasurement-of.html</guid>
+<description>The dominant narrative of contemporary political economy holds that advanced economies have experienced decades of stagnating real wages and rising inequalit...</description>
+<dc:creator>Franco Cazzaniga</dc:creator>
+<enclosure url="https://ai-theoretical.org/papers/the-invisible-wealth-mismeasurement-of.pdf" type="application/pdf"/>
+</item>
+<item>
+<title>The Stack of Local Representations on a Coadjoint Orbit: A Categorical Approach</title>
+<link>https://ai-theoretical.org/papers/the-stack-of-local-representations.html</link>
+<guid isPermaLink="true">https://ai-theoretical.org/papers/the-stack-of-local-representations.html</guid>
+<description>We construct a stack R of local stabilizer representations over a coadjoint orbit O of a compact Lie group G, verify the descent conditions explicitly, and s...</description>
+<dc:creator>Franco Cazzaniga</dc:creator>
+<enclosure url="https://ai-theoretical.org/papers/the-stack-of-local-representations.pdf" type="application/pdf"/>
+</item>
+<item>
+<title>Wave Function Collapse as Lie Algebra Contraction: The SU(2) Spin-1/2 Paradigm</title>
+<link>https://ai-theoretical.org/papers/wave-function-collapse-as-lie.html</link>
+<guid isPermaLink="true">https://ai-theoretical.org/papers/wave-function-collapse-as-lie.html</guid>
+<description>We propose a geometric mechanism for the emergence of discrete measurement outcomes in the Stern–Gerlach experiment, based on the In¨on¨u–Wigner contraction ...</description>
+<dc:creator>Franco Cazzaniga</dc:creator>
+<enclosure url="https://ai-theoretical.org/papers/wave-function-collapse-as-lie.pdf" type="application/pdf"/>
+</item>
+</channel>
+</rss>
