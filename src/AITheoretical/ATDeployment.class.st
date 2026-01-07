@@ -11,6 +11,15 @@ ATDeployment class >> deploy [
 	^ self deployWithMessage: 'Update static pages'
 ]
 
+{ #category : 'as yet unclassified' }
+ATDeployment class >> deployGitRepoPath: aPath withMessage: aMessage [
+    "Fa pull, commit e push con path e messaggio custom"
+    | cmd result |
+    cmd := 'cd "', aPath, '" && git pull && git add -A && git commit -m "', aMessage, '" && git push 2>&1'.
+    result := LibC resultOfCommand: cmd.
+    ^ result
+]
+
 { #category : 'operations' }
 ATDeployment class >> deployWithMessage: aMessage [
 	"Genera le pagine e fa commit+push con messaggio custom"

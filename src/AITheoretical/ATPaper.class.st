@@ -19,7 +19,8 @@ Class {
 		'submissionId',
 		'assessmentPromptVersion',
 		'track',
-		'isTest'
+		'isTest',
+		'allAuthors'
 	],
 	#category : 'AITheoretical',
 	#package : 'AITheoretical'
@@ -32,6 +33,7 @@ ATPaper class >> fromDictionary: aDict [
     paper := self new
         title: (aDict at: 'title' ifAbsent: [ '' ]);
         authors: (aDict at: 'author' ifAbsent: [ '' ]);
+        allAuthors: (aDict at: 'all_authors' ifAbsent: [ #() ]);
         aiModels: (aDict at: 'ai_model' ifAbsent: [ '' ]);
         date: (aDict at: 'date' ifAbsent: [ '' ]);
         pages: (aDict at: 'pages' ifAbsent: [ '' ]);
@@ -98,11 +100,23 @@ ATPaper >> aiModels: anObject [
 aiModels := anObject
 ]
 
+{ #category : 'as yet unclassified' }
+ATPaper >> allAuthors [
+    "Array di tutti i nomi autori per indicizzazione"
+    ^ allAuthors ifNil: [ #() ]
+]
+
+{ #category : 'as yet unclassified' }
+ATPaper >> allAuthors: anArray [
+    allAuthors := anArray
+]
+
 { #category : 'converting' }
 ATPaper >> asDictionary [
     ^ Dictionary new
         at: 'title' put: title;
         at: 'author' put: authors;
+        at: 'all_authors' put: self allAuthors;
         at: 'ai_model' put: aiModels;
         at: 'date' put: date;
         at: 'pages' put: pages;

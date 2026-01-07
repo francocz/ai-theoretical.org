@@ -163,6 +163,25 @@ ATAuditLog >> logTestAssessment: aSubmission verdict: aVerdict assessment: anAss
     self appendEntry: entry toFile: testLogPath fullName
 ]
 
+{ #category : 'as yet unclassified' }
+ATAuditLog >> logTokenUsage: usageDict cost: cost provider: providerSymbol model: modelName forSubmission: aSubmission [
+    "Logga uso dei token"
+    | entry |
+    usageDict ifNil: [ ^ self ].
+    entry := Dictionary new.
+    entry at: 'timestamp' put: DateAndTime now asString.
+    entry at: 'type' put: 'token_usage'.
+    entry at: 'submissionId' put: (aSubmission ifNotNil: [ aSubmission id ] ifNil: [ 'unknown' ]).
+    entry at: 'provider' put: providerSymbol asString.
+    entry at: 'model' put: modelName.
+    entry at: 'inputTokens' put: (usageDict at: 'input_tokens' ifAbsent: [ 0 ]).
+    entry at: 'outputTokens' put: (usageDict at: 'output_tokens' ifAbsent: [ 0 ]).
+    entry at: 'estimatedCostUSD' put: cost.
+    entries add: entry.
+    self saveToFile.
+    ^ entry
+]
+
 { #category : 'querying' }
 ATAuditLog >> recentEntries: n [
 	"Ritorna le ultime n entries"

@@ -6,7 +6,9 @@ Class {
 		'apiKey',
 		'model',
 		'editorialPrompt',
-		'promptVersion'
+		'promptVersion',
+		'lastUsage',
+		'lastCost'
 	],
 	#category : 'AITheoretical',
 	#package : 'AITheoretical'
@@ -61,34 +63,57 @@ ATAssessmentGenerator >> apiKey: aString [ apiKey := aString
 
 { #category : 'api' }
 ATAssessmentGenerator >> assessPaper: paperText [
-	| client payload response responseDict |
-	client := ZnClient new.
-	client url: self apiEndpoint.
-	client timeout: 120.  "2 minuti invece del default"
-	self configureClient: client.
-	payload := self buildPayloadFor: paperText.
-	client entity: (ZnEntity json: (NeoJSONWriter toString: payload)).
-	client post.
-	response := client contents.
-	responseDict := NeoJSONReader fromString: response.
-	^ self extractTextFrom: responseDict
+    "Chiama l'API AI e ritorna l'assessment. Solleva errore se fallisce."
+    | client payload response responseDict |
+    client := ZnClient new.
+    client url: self apiEndpoint.
+    client timeout: 120.  "2 minuti invece del default"
+    self configureClient: client.
+    payload := self buildPayloadFor: paperText.
+    client entity: (ZnEntity json: (NeoJSONWriter toString: payload)).
+    
+    [ client post ]
+        on: Error
+        do: [ :e | self error: 'API request failed: ', e messageText ].
+    
+    response := client contents.
+    response ifNil: [ self error: 'Empty response from API' ].
+    response isEmpty ifTrue: [ self error: 'Empty response from API' ].
+    
+    [ responseDict := NeoJSONReader fromString: response ]
+        on: Error
+        do: [ :e | self error: 'Invalid JSON response: ', e messageText ].
+    
+    "Controlla se c'è un errore nella risposta"
+    (responseDict at: 'error' ifAbsent: [ nil ]) ifNotNil: [ :err |
+        self error: 'API error: ', (err at: 'message' ifAbsent: [ err asString ]) ].
+    
+    ^ self extractTextFrom: responseDict
 ]
 
 { #category : 'api' }
 ATAssessmentGenerator >> assessSubmission: anATSubmission [
-    | paperText lf savedPrompt result |
+    "Valuta una submission - con PDF se disponibile, altrimenti solo metadati"
+    | pdfBytes paperText lf savedPrompt result |
+    
+    "Prova a scaricare il PDF"
+    pdfBytes := self downloadPdfFor: anATSubmission.
+    
+    pdfBytes ifNotNil: [
+        "Usa valutazione con PDF completo"
+        ^ self assessSubmissionWithPdf: anATSubmission pdfBytes: pdfBytes ].
+    
+    "Fallback: solo metadati (title, author, abstract)"
     lf := String lf.
     paperText := 'Title: ' , anATSubmission title , lf ,
         'Author: ' , anATSubmission authorName , lf ,
         'Abstract: ' , anATSubmission abstract.
     
-    "Salva prompt corrente, usa quello appropriato al track"
     savedPrompt := editorialPrompt.
     editorialPrompt := self promptForTrack: anATSubmission track.
     
     result := self assessPaper: paperText.
     
-    "Ripristina"
     editorialPrompt := savedPrompt.
     
     ^ result
@@ -130,6 +155,69 @@ ATAssessmentGenerator >> assessSubmissionWithMetadata: anATSubmission [
 		yourself
 ]
 
+{ #category : 'as yet unclassified' }
+ATAssessmentGenerator >> assessSubmissionWithPdf: anATSubmission pdfBytes: pdfBytes [
+    "Valuta una submission includendo il PDF completo, traccia usage"
+    | metadataText lf savedPrompt pdfBase64 client payload response responseDict usage cost inputTokens outputTokens |
+    
+    lf := String lf.
+    metadataText := 'Title: ' , anATSubmission title , lf ,
+        'Author: ' , anATSubmission authorName , lf ,
+        'Abstract: ' , anATSubmission abstract , lf , lf ,
+        'The full PDF is attached. Please evaluate the complete paper including all sections, figures, and bibliography.'.
+    
+    "Salva prompt corrente, usa quello appropriato al track"
+    savedPrompt := editorialPrompt.
+    editorialPrompt := self promptForTrack: anATSubmission track.
+    
+    "Encode PDF in base64"
+    pdfBase64 := ZnBase64Encoder new encode: pdfBytes.
+    
+    "Costruisci e invia richiesta"
+    client := ZnClient new.
+    client url: self apiEndpoint.
+    client timeout: 180.  "3 minuti per PDF"
+    self configureClient: client.
+    payload := self buildPayloadWithPdf: pdfBase64 metadata: metadataText.
+    client entity: (ZnEntity json: (NeoJSONWriter toString: payload)).
+    
+    [ client post ]
+        on: Error
+        do: [ :e | 
+            editorialPrompt := savedPrompt.
+            self error: 'API request failed: ', e messageText ].
+    
+    response := client contents.
+    editorialPrompt := savedPrompt.
+    
+    response ifNil: [ self error: 'Empty response from API' ].
+    response isEmpty ifTrue: [ self error: 'Empty response from API' ].
+    
+    [ responseDict := NeoJSONReader fromString: response ]
+        on: Error
+        do: [ :e | self error: 'Invalid JSON response: ', e messageText ].
+    
+    "Controlla errore"
+    (responseDict at: 'error' ifAbsent: [ nil ]) ifNotNil: [ :err |
+        self error: 'API error: ', (err at: 'message' ifAbsent: [ err asString ]) ].
+    
+    "Traccia usage"
+    usage := self extractUsageFrom: responseDict.
+    cost := self estimateCostFor: usage.
+    lastUsage := usage.
+    lastCost := cost.
+    
+    "Registra su ATUsageTracker - usa chiavi stringa con underscore come in usage dict"
+    inputTokens := usage at: 'input_tokens' ifAbsent: [ 0 ].
+    outputTokens := usage at: 'output_tokens' ifAbsent: [ 0 ].
+    ATUsageTracker current recordUsageFor: provider inputTokens: inputTokens outputTokens: outputTokens.
+    
+    "Log usage"
+    ATAuditLog current logTokenUsage: usage cost: cost provider: provider model: model forSubmission: anATSubmission.
+    
+    ^ self extractTextFrom: responseDict
+]
+
 { #category : 'private' }
 ATAssessmentGenerator >> buildPayloadFor: paperText [
 	| payload messages |
@@ -154,6 +242,65 @@ ATAssessmentGenerator >> buildPayloadFor: paperText [
 		payload at: 'generationConfig' put: (Dictionary new at: 'temperature' put: 0; yourself).
 		^ payload ].
 	self error: 'Unknown provider'
+]
+
+{ #category : 'as yet unclassified' }
+ATAssessmentGenerator >> buildPayloadWithPdf: pdfBase64 metadata: metadataText [
+    "Costruisce payload con PDF embedded per i vari provider"
+    | payload messages userContent |
+    
+    provider = #anthropic ifTrue: [
+        "Anthropic: array di content blocks"
+        userContent := OrderedCollection new.
+        userContent add: (Dictionary new 
+            at: 'type' put: 'document';
+            at: 'source' put: (Dictionary new
+                at: 'type' put: 'base64';
+                at: 'media_type' put: 'application/pdf';
+                at: 'data' put: pdfBase64;
+                yourself);
+            yourself).
+        userContent add: (Dictionary new
+            at: 'type' put: 'text';
+            at: 'text' put: (self buildPromptFor: metadataText);
+            yourself).
+        messages := { Dictionary new 
+            at: 'role' put: 'user'; 
+            at: 'content' put: userContent asArray; 
+            yourself }.
+        payload := Dictionary new.
+        payload at: 'model' put: model.
+        payload at: 'max_tokens' put: 4096.
+        payload at: 'temperature' put: 0.
+        payload at: 'messages' put: messages.
+        ^ payload ].
+    
+    provider = #google ifTrue: [
+        "Google: inline_data per PDF"
+        payload := Dictionary new.
+        payload at: 'contents' put: { 
+            Dictionary new 
+                at: 'parts' put: {
+                    Dictionary new 
+                        at: 'inline_data' put: (Dictionary new
+                            at: 'mime_type' put: 'application/pdf';
+                            at: 'data' put: pdfBase64;
+                            yourself);
+                        yourself.
+                    Dictionary new 
+                        at: 'text' put: (self buildPromptFor: metadataText);
+                        yourself
+                }; 
+                yourself 
+        }.
+        payload at: 'generationConfig' put: (Dictionary new at: 'temperature' put: 0; yourself).
+        ^ payload ].
+    
+    provider = #openai ifTrue: [
+        "OpenAI: fallback a solo testo - OpenAI richiede conversione PDF->immagini"
+        ^ self buildPayloadFor: metadataText ].
+    
+    self error: 'Unknown provider'
 ]
 
 { #category : 'private' }
@@ -226,6 +373,24 @@ ATAssessmentGenerator >> defaultEditorialPrompt [
 	'[Write 2-3 paragraphs providing detailed analysis of the paper]'
 ]
 
+{ #category : 'as yet unclassified' }
+ATAssessmentGenerator >> downloadPdfFor: anATSubmission [
+    "Scarica il PDF via API Worker"
+    | client url |
+    anATSubmission id ifNil: [ ^ nil ].
+    
+    "Costruisci URL per download PDF"
+    url := 'https://ai-theoretical.org/api/submission/', anATSubmission id, '/pdf'.
+    
+    client := ZnClient new.
+    client timeout: 60.
+    client url: url.
+    client headerAt: 'Authorization' put: 'Bearer ', ATRepository current apiToken.
+    client get.
+    client isSuccess ifFalse: [ ^ nil ].
+    ^ client contents asByteArray
+]
+
 { #category : 'accessing' }
 ATAssessmentGenerator >> editorialPrompt [ ^ editorialPrompt
 ]
@@ -234,19 +399,92 @@ ATAssessmentGenerator >> editorialPrompt [ ^ editorialPrompt
 ATAssessmentGenerator >> editorialPrompt: aString [ editorialPrompt := aString
 ]
 
+{ #category : 'as yet unclassified' }
+ATAssessmentGenerator >> estimateCostFor: usageDict [
+    "Stima il costo in USD basato su provider/model"
+    | inputTokens outputTokens inputCost outputCost |
+    usageDict ifNil: [ ^ 0 ].
+    inputTokens := usageDict at: 'input_tokens' ifAbsent: [ 0 ].
+    outputTokens := usageDict at: 'output_tokens' ifAbsent: [ 0 ].
+    
+    "Prezzi per milione di token (approssimati, gennaio 2026)"
+    provider = #anthropic ifTrue: [
+        "Claude Sonnet 4: $3 input, $15 output per 1M"
+        inputCost := inputTokens * 3 / 1000000.
+        outputCost := outputTokens * 15 / 1000000.
+        ^ inputCost + outputCost ].
+    provider = #google ifTrue: [
+        "Gemini: ~$0.5 input, $1.5 output per 1M"
+        inputCost := inputTokens * 0.5 / 1000000.
+        outputCost := outputTokens * 1.5 / 1000000.
+        ^ inputCost + outputCost ].
+    provider = #openai ifTrue: [
+        "GPT-4: ~$10 input, $30 output per 1M"
+        inputCost := inputTokens * 10 / 1000000.
+        outputCost := outputTokens * 30 / 1000000.
+        ^ inputCost + outputCost ].
+    ^ 0
+]
+
 { #category : 'private' }
 ATAssessmentGenerator >> extractTextFrom: responseDict [
-	| content |
-	provider = #anthropic ifTrue: [
-		content := responseDict at: 'content' ifAbsent: [ ^ '' ].
-		^ (content first at: 'text' ifAbsent: [ '' ]) ].
-	provider = #openai ifTrue: [
-		content := responseDict at: 'choices' ifAbsent: [ ^ '' ].
-		^ ((content first at: 'message' ifAbsent: [ Dictionary new ]) at: 'content' ifAbsent: [ '' ]) ].
-	provider = #google ifTrue: [
-		content := responseDict at: 'candidates' ifAbsent: [ ^ '' ].
-		^ ((((content first at: 'content' ifAbsent: [ Dictionary new ]) at: 'parts' ifAbsent: [ { Dictionary new } ]) first) at: 'text' ifAbsent: [ '' ]) ].
-	^ ''
+    "Estrae il testo dalla risposta API. Ritorna stringa vuota se formato non riconosciuto."
+    | content |
+    
+    responseDict isDictionary ifFalse: [ ^ '' ].
+    
+    provider = #anthropic ifTrue: [
+        content := responseDict at: 'content' ifAbsent: [ ^ '' ].
+        content isCollection ifFalse: [ ^ '' ].
+        content isEmpty ifTrue: [ ^ '' ].
+        ^ (content first at: 'text' ifAbsent: [ '' ]) asString ].
+    
+    provider = #openai ifTrue: [
+        content := responseDict at: 'choices' ifAbsent: [ ^ '' ].
+        content isCollection ifFalse: [ ^ '' ].
+        content isEmpty ifTrue: [ ^ '' ].
+        ^ ((content first at: 'message' ifAbsent: [ Dictionary new ]) at: 'content' ifAbsent: [ '' ]) asString ].
+    
+    provider = #google ifTrue: [
+        | candidates candidate parts |
+        candidates := responseDict at: 'candidates' ifAbsent: [ ^ '' ].
+        candidates isCollection ifFalse: [ ^ '' ].
+        candidates isEmpty ifTrue: [ ^ '' ].
+        candidate := candidates first.
+        candidate isDictionary ifFalse: [ ^ '' ].
+        content := candidate at: 'content' ifAbsent: [ ^ '' ].
+        content isDictionary ifFalse: [ ^ '' ].
+        parts := content at: 'parts' ifAbsent: [ ^ '' ].
+        parts isCollection ifFalse: [ ^ '' ].
+        parts isEmpty ifTrue: [ ^ '' ].
+        ^ (parts first at: 'text' ifAbsent: [ '' ]) asString ].
+    
+    ^ ''
+]
+
+{ #category : 'as yet unclassified' }
+ATAssessmentGenerator >> extractUsageFrom: responseDict [
+    "Estrae input/output tokens dalla risposta API"
+    | usage |
+    provider = #anthropic ifTrue: [
+        usage := responseDict at: 'usage' ifAbsent: [ ^ nil ].
+        ^ Dictionary new
+            at: 'input_tokens' put: (usage at: 'input_tokens' ifAbsent: [ 0 ]);
+            at: 'output_tokens' put: (usage at: 'output_tokens' ifAbsent: [ 0 ]);
+            yourself ].
+    provider = #google ifTrue: [
+        usage := responseDict at: 'usageMetadata' ifAbsent: [ ^ nil ].
+        ^ Dictionary new
+            at: 'input_tokens' put: (usage at: 'promptTokenCount' ifAbsent: [ 0 ]);
+            at: 'output_tokens' put: (usage at: 'candidatesTokenCount' ifAbsent: [ 0 ]);
+            yourself ].
+    provider = #openai ifTrue: [
+        usage := responseDict at: 'usage' ifAbsent: [ ^ nil ].
+        ^ Dictionary new
+            at: 'input_tokens' put: (usage at: 'prompt_tokens' ifAbsent: [ 0 ]);
+            at: 'output_tokens' put: (usage at: 'completion_tokens' ifAbsent: [ 0 ]);
+            yourself ].
+    ^ nil
 ]
 
 { #category : 'configuration' }

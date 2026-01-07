@@ -12,7 +12,7 @@ ATIndexPage >> content [
 
 { #category : 'generating' }
 ATIndexPage >> contentHtml [
-	^ '<div class="container">
+    ^ '<div class="container">
     <header>
         <div class="top-subtitle">Human-AI Theoretical Laboratory</div>
         <h1>AI-Theoretical</h1>
@@ -37,19 +37,30 @@ ATIndexPage >> contentHtml [
 
     <div class="search-section">
         <div class="search-box">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search papers by title, author, abstract, or keywords...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search papers by title, author, abstract...">
         </div>
-        <div class="search-filters">
-            <select id="yearFilter" class="filter-select">
-                <option value="">All Years</option>
-            </select>
-            <select id="authorFilter" class="filter-select">
-                <option value="">All Authors</option>
-            </select>
-            <select id="aiFilter" class="filter-select">
-                <option value="">All AI Models</option>
+        
+        <div class="track-filters">
+            <button class="track-btn active" data-track="all">All</button>
+            <button class="track-btn" data-track="researchPreprint">Research Preprints</button>
+            <button class="track-btn" data-track="workingPaper">Working Papers</button>
+            <button class="track-btn" data-track="expositoryEssay">Expository Essays</button>
+            <button class="track-btn" data-track="criticalReview">Critical Reviews</button>
+        </div>
+        
+        <div class="view-controls">
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="full" title="Full view">☰</button>
+                <button class="view-btn" data-view="compact" title="Compact view">▤</button>
+            </div>
+            <select id="sortSelect" class="sort-select">
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="title-asc">Title A-Z</option>
+                <option value="title-desc">Title Z-A</option>
             </select>
         </div>
+        
         <div id="searchStatus" class="search-results-count"></div>
     </div>
 
@@ -61,7 +72,7 @@ ATIndexPage >> contentHtml [
 
 { #category : 'generating' }
 ATIndexPage >> css [
-	^ ATStyles baseCss, String lf, ATStyles indexCss
+    ^ ATStyles baseCss, String lf, ATStyles indexCss, String lf, ATStyles trackFiltersCss
 ]
 
 { #category : 'accessing' }
@@ -74,7 +85,7 @@ ATIndexPage >> fileName [
 	^ 'index.html'
 ]
 
-{ #category : 'generating' }
+{ #category : 'html generation' }
 ATIndexPage >> footer [
 	^ '<footer>
     Interested in participating? Contact <a href="mailto:franco.cazzaniga@uninsubria.it">franco.cazzaniga@uninsubria.it</a>
@@ -86,153 +97,30 @@ ATIndexPage >> footer [
 
 { #category : 'generating' }
 ATIndexPage >> head [
-	^ String streamContents: [ :s |
-		s << '<head>'; << String lf.
-		s << '    <meta charset="UTF-8">'; << String lf.
-		s << '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'; << String lf.
-		s << '    <title>'; << self title; << '</title>'; << String lf.
-		s << '    <meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; << String lf.
-		s << '    <meta name="description" content="'; << self description; << '">'; << String lf.
-		s << '    <meta name="keywords" content="AI, theoretical papers, human-AI collaboration, epistemology, philosophy of AI, Franco Cazzaniga">'; << String lf.
-		s << '    <meta property="og:title" content="AI-Theoretical | Human-AI Research">'; << String lf.
-		s << '    <meta property="og:description" content="Publishing high-quality theoretical papers co-authored by humans and AI.">'; << String lf.
-		s << '    <meta property="og:url" content="https://ai-theoretical.org">'; << String lf.
-		s << '    <meta property="og:type" content="website">'; << String lf.
-		s << self fonts.
-		s << '    <style>'; << String lf.
-		s << self css.
-		s << '    </style>'; << String lf.
-		s << '</head>'; << String lf ]
+    ^ String streamContents: [ :s |
+        s << '<head>'; << String lf.
+        s << '    <meta charset="UTF-8">'; << String lf.
+        s << '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'; << String lf.
+        s << '    <link rel="icon" type="image/svg+xml" href="favicon.svg">'; << String lf.
+        s << '    <title>'; << self title; << '</title>'; << String lf.
+        s << '    <meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; << String lf.
+        s << '    <meta name="description" content="'; << self description; << '">'; << String lf.
+        s << '    <meta name="keywords" content="AI, theoretical papers, human-AI collaboration, epistemology, philosophy of AI, Franco Cazzaniga">'; << String lf.
+        s << '    <meta property="og:title" content="AI-Theoretical | Human-AI Research">'; << String lf.
+        s << '    <meta property="og:description" content="Publishing high-quality theoretical papers co-authored by humans and AI.">'; << String lf.
+        s << '    <meta property="og:url" content="https://ai-theoretical.org">'; << String lf.
+        s << '    <meta property="og:type" content="website">'; << String lf.
+        s << self fonts.
+        s << '    <style>'; << String lf.
+        s << self css.
+        s << '    </style>'; << String lf.
+        s << '</head>'; << String lf ]
 ]
 
 { #category : 'generating' }
 ATIndexPage >> javascript [
-	^ '<script src="papers.js"></script>
-<script>
-    const repo = document.getElementById(''repository'');
-    const searchInput = document.getElementById(''searchInput'');
-    const yearFilter = document.getElementById(''yearFilter'');
-    const authorFilter = document.getElementById(''authorFilter'');
-    const aiFilter = document.getElementById(''aiFilter'');
-    const searchStatus = document.getElementById(''searchStatus'');
-    
-    let allPapers = [];
-
-    function highlightText(text, query) {
-        if (!query || !text) return text;
-        const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-        if (words.length === 0) return text;
-        const regex = new RegExp(`(${words.join(''|'')})`    , ''gi'');
-        return text.replace(regex, ''<span class="highlight">$1</span>'');
-    }
-
-    function matchesPaper(paper, query) {
-        if (!query) return true;
-        const q = query.toLowerCase();
-        const words = q.split(/\s+/).filter(w => w.length > 0);
-        const searchable = `${paper.title} ${paper.author} ${paper.abstract || ''''} ${paper.ai_model || ''''}`.toLowerCase();
-        return words.every(word => searchable.includes(word));
-    }
-
-    function filterPapers() {
-        const query = searchInput.value.trim();
-        const year = yearFilter.value;
-        const author = authorFilter.value;
-        const ai = aiFilter.value;
-
-        let filtered = allPapers.filter(p => {
-            if (!matchesPaper(p, query)) return false;
-            if (year && !p.date?.includes(year)) return false;
-            if (author && p.author !== author) return false;
-            if (ai && p.ai_model !== ai) return false;
-            return true;
-        });
-
-        renderPapers(filtered, query);
-        updateStatus(filtered.length, allPapers.length);
-    }
-
-    function updateStatus(shown, total) {
-        if (searchInput.value || yearFilter.value || authorFilter.value || aiFilter.value) {
-            searchStatus.innerHTML = `Showing <strong>${shown}</strong> of ${total} papers <span class="clear-search" onclick="clearSearch()">Clear filters</span>`;
-        } else {
-            searchStatus.innerHTML = `<strong>${total}</strong> papers published`;
-        }
-    }
-
-    function clearSearch() {
-        searchInput.value = '''';
-        yearFilter.value = '''';
-        authorFilter.value = '''';
-        aiFilter.value = '''';
-        filterPapers();
-    }
-
-    function populateFilters() {
-        const years = [...new Set(allPapers.map(p => p.date?.substring(0, 4)).filter(Boolean))].sort().reverse();
-        const authors = [...new Set(allPapers.map(p => p.author).filter(Boolean))].sort();
-        const ais = [...new Set(allPapers.map(p => p.ai_model).filter(Boolean))].sort();
-
-        years.forEach(y => yearFilter.innerHTML += `<option value="${y}">${y}</option>`);
-        authors.forEach(a => authorFilter.innerHTML += `<option value="${a}">${a}</option>`);
-        ais.forEach(a => aiFilter.innerHTML += `<option value="${a}">${a}</option>`);
-    }
-
-    function renderPapers(papers, query = '''') {
-        repo.innerHTML = papers.map((p, i) => {
-            const title = highlightText(p.title, query);
-            const author = highlightText(p.author, query);
-            const abstract = highlightText(p.abstract, query);
-            return `
-            <article class="paper-entry">
-                <h2 class="paper-title">${title}</h2>
-                <div class="paper-meta">
-                    By <strong>${author}</strong> & <span class="ai-tag">${p.ai_model}</span> | ${p.date} - ${p.pages} Pages
-                </div>
-                <div class="btn-group">
-                    <a href="${p.pdf_file}" class="btn btn-black" download>Download PDF</a>
-                    <button class="btn btn-white" onclick="toggle(''abs-${i}'')">Abstract</button>
-                    ${p.ai_assessment ? `<button class="btn btn-white" onclick="toggle(''ass-${i}'')">AI Assessment</button>` : ``}
-                    ${p.notes ? `<button class="btn btn-white" onclick="toggle(''notes-${i}'')">Notes</button>` : ``}
-                </div>
-                <div id="abs-${i}" class="abstract-panel">
-                    <strong>Abstract:</strong><br><br>${abstract}
-                </div>
-                ${p.ai_assessment ? `
-                <div id="ass-${i}" class="abstract-panel">
-                    <strong>AI Editorial Assessment:</strong><br><br>
-                    <pre style="white-space: pre-wrap; font-family: inherit;">${p.ai_assessment}</pre>
-                </div>
-                ` : ``}
-                ${p.notes ? `
-                <div id="notes-${i}" class="abstract-panel">
-                    <strong>Notes on AI Collaboration:</strong><br><br>
-                    <pre style="white-space: pre-wrap; font-family: inherit;">${p.notes}</pre>
-                </div>
-                ` : ``}
-            </article>
-        `}).join('''');
-    }
-
-    function toggle(id) { 
-        document.getElementById(id).classList.toggle(''show''); 
-    }
-
-    function init() {
-        if (typeof PAPERS_DATA === ''undefined'') return;
-        allPapers = PAPERS_DATA;
-        populateFilters();
-        renderPapers(allPapers);
-        updateStatus(allPapers.length, allPapers.length);
-
-        searchInput.addEventListener(''input'', filterPapers);
-        yearFilter.addEventListener(''change'', filterPapers);
-        authorFilter.addEventListener(''change'', filterPapers);
-        aiFilter.addEventListener(''change'', filterPapers);
-    }
-
-    window.onload = init;
-</script>'
+    ^ '<script src="papers.js"></script>
+<script src="index-app.js"></script>'
 ]
 
 { #category : 'accessing' }

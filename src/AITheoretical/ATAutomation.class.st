@@ -135,31 +135,34 @@ ATAutomation >> emailSender: anATEmailSender [
 
 { #category : 'processing' }
 ATAutomation >> executeDecision: verdict forSubmission: aSubmission withAssessment: assessment [
-	"Esegue accept/reject per una submission"
-	| collaboration notes result |
-	collaboration := aSubmission aiModels ifNil: [ '' ].
-	notes := aSubmission notes ifNil: [ '' ].
-	
-	verdict = #accept ifTrue: [
-		ATRepository current
-			acceptRemoteSubmission: aSubmission
-			withAssessment: assessment
-			withCollaboration: collaboration
-			withNotes: notes.
-		emailSender ifNotNil: [
-			emailSender sendAcceptanceTo: aSubmission withAssessment: assessment ].
-		ATAuditLog current logDecision: #accept forSubmission: aSubmission.
-		^ #accepted ].
-	
-	verdict = #reject ifTrue: [
-		ATRepository current rejectRemoteSubmission: aSubmission.
-		emailSender ifNotNil: [
-			emailSender sendRejectionTo: aSubmission withAssessment: assessment ].
-		ATAuditLog current logDecision: #reject forSubmission: aSubmission.
-		^ #rejected ].
-	
-	ATAuditLog current logDecision: #review forSubmission: aSubmission.
-	^ #review
+    "Esegue accept/reject/review per una submission"
+    | collaboration notes |
+    collaboration := aSubmission aiModels ifNil: [ '' ].
+    notes := aSubmission notes ifNil: [ '' ].
+    
+    verdict = #accept ifTrue: [
+        ATRepository current
+            acceptRemoteSubmission: aSubmission
+            withAssessment: assessment
+            withCollaboration: collaboration
+            withNotes: notes.
+        emailSender ifNotNil: [
+            emailSender sendAcceptanceTo: aSubmission withAssessment: assessment ].
+        ATAuditLog current logDecision: #accept forSubmission: aSubmission.
+        ^ #accepted ].
+    
+    "reject e review sono entrambi rifiuti, ma con email diverse"
+    (verdict = #reject or: [ verdict = #review ]) ifTrue: [
+        ATRepository current rejectRemoteSubmission: aSubmission.
+        emailSender ifNotNil: [
+            verdict = #review 
+                ifTrue: [ emailSender sendRevisionRequestTo: aSubmission withAssessment: assessment ]
+                ifFalse: [ emailSender sendRejectionTo: aSubmission withAssessment: assessment ] ].
+        ATAuditLog current logDecision: verdict forSubmission: aSubmission.
+        ^ #rejected ].
+    
+    "Non dovrebbe mai arrivare qui"
+    self error: 'executeDecision called with invalid verdict: ', verdict asString
 ]
 
 { #category : 'configuration' }
@@ -169,11 +172,10 @@ ATAutomation >> fullAuto [
 
 { #category : 'initialization' }
 ATAutomation >> initialize [
-	super initialize.
-	mode := #semiAuto.
-	pendingApprovals := OrderedCollection new.
-	processedIds := Set new.
-	isRunning := false
+    super initialize.
+    mode := #semiAuto.
+    pendingApprovals := OrderedCollection new.
+    processedIds := Set new
 ]
 
 { #category : 'testing' }
@@ -244,16 +246,55 @@ ATAutomation >> operatingMode: aSymbol [
     operatingMode := aSymbol
 ]
 
-{ #category : 'parsing' }
+{ #category : 'as yet unclassified' }
+ATAutomation >> parseAuthors: assessmentText [
+    "Estrae la lista degli autori dal criterio 17 dell'assessment.
+     Ritorna un array di stringhe con i nomi, o array vuoto se non trovato."
+    | lines authorsLine jsonStart jsonEnd jsonString |
+    
+    (assessmentText isNil or: [ assessmentText isEmpty ]) ifTrue: [ ^ #() ].
+    
+    lines := assessmentText lines.
+    authorsLine := lines 
+        detect: [ :l | l includesSubstring: 'Authors list:' ] 
+        ifNone: [ ^ #() ].
+    
+    "Cerco il JSON array nella riga"
+    jsonStart := authorsLine indexOf: $[.
+    jsonEnd := authorsLine lastIndexOf: $].
+    
+    (jsonStart = 0 or: [ jsonEnd = 0 or: [ jsonEnd < jsonStart ] ]) ifTrue: [ ^ #() ].
+    
+    jsonString := authorsLine copyFrom: jsonStart to: jsonEnd.
+    
+    "Parse JSON"
+    [ ^ NeoJSONReader fromString: jsonString ]
+        on: Error
+        do: [ :e | ^ #() ]
+]
+
+{ #category : 'private' }
 ATAutomation >> parseVerdict: assessmentText [
-	"Estrae il verdict dall'assessment. Ritorna #accept, #reject o #review"
-	| lines outcomeLine |
-	lines := assessmentText lines.
-	outcomeLine := lines detect: [ :l | l includesSubstring: 'Editorial outcome:' ] ifNone: [ ^ #review ].
-	(outcomeLine includesSubstring: 'Suitable for inclusion') ifTrue: [ ^ #accept ].
-	(outcomeLine includesSubstring: 'Not suitable') ifTrue: [ ^ #reject ].
-	(outcomeLine includesSubstring: 'Needs revision') ifTrue: [ ^ #reject ].
-	^ #review
+    "Estrae il verdict dall'assessment. 
+     Ritorna #accept, #reject, #review (decisioni valide) oppure #aiFailure se non riconosciuto"
+    | lines outcomeLine |
+    
+    "Assessment vuoto o nil = failure"
+    (assessmentText isNil or: [ assessmentText isEmpty ]) ifTrue: [ ^ #aiFailure ].
+    
+    lines := assessmentText lines.
+    outcomeLine := lines 
+        detect: [ :l | l includesSubstring: 'Editorial outcome:' ] 
+        ifNone: [ ^ #aiFailure ].  "Nessuna riga outcome = failure"
+    
+    (outcomeLine includesSubstring: 'Suitable for inclusion') ifTrue: [ ^ #accept ].
+    (outcomeLine includesSubstring: 'Not suitable') ifTrue: [ ^ #reject ].
+    (outcomeLine includesSubstring: 'Potentially suitable') ifTrue: [ ^ #review ].
+    (outcomeLine includesSubstring: 'with revision') ifTrue: [ ^ #review ].
+    (outcomeLine includesSubstring: 'Needs revision') ifTrue: [ ^ #review ].
+    
+    "Outcome presente ma non riconosciuto = failure"
+    ^ #aiFailure
 ]
 
 { #category : 'accessing' }
@@ -271,52 +312,56 @@ ATAutomation >> processSubmission: aSubmission [
     "Processa una submission: genera assessment, decide in base alla modalità"
     | assessment verdict config prompt |
     
-    "Già processata?"
+    "Già processata? Esci subito"
     (processedIds includes: aSubmission id) ifTrue: [ ^ #alreadyProcessed ].
+    
+    "Rate limit check"
+    ATRateLimiter current canAcceptSubmission ifFalse: [
+        ATAuditLog current logError: 'Daily rate limit exceeded' forSubmission: aSubmission.
+        ^ #rateLimitExceeded ].
+    
+    "Riserva subito per evitare doppi processing"
+    processedIds add: aSubmission id.
+    ATRateLimiter current registerSubmission.
     
     "In test mode, marca la submission"
     self isTestMode ifTrue: [ aSubmission markAsTest ].
     
     "Genera assessment - simulato o reale"
-    self isSimulatedMode ifTrue: [
-        "Usa assessment simulato"
-        assessment := self simulatedAssessmentForVerdict: #review.
-        aSubmission promptVersion: 'simulated'.
-    ] ifFalse: [
-        "Usa AI reale"
-        assessmentGenerator ifNil: [ ^ self error: 'No assessment generator configured' ].
-        
-        "Ottieni prompt dal registry"
-        prompt := ATPromptRegistry current activePromptForTrack: aSubmission track.
-        prompt ifNotNil: [
-            assessmentGenerator editorialPrompt: prompt content.
-            aSubmission promptVersion: aSubmission track asString, ' v', prompt version ].
-        
-        [ assessment := assessmentGenerator assessSubmission: aSubmission ]
-            on: Error
-            do: [ :e | 
-                ATAuditLog current logError: e messageText forSubmission: aSubmission.
-                ^ #error ].
-        
-        "Se assessment vuoto, non procedere"
-        (assessment isNil or: [ assessment isEmpty ]) ifTrue: [
-            ATAuditLog current logError: 'Empty assessment received' forSubmission: aSubmission.
-            ^ #emptyAssessment ] ].
+    [ 
+        self isSimulatedMode ifTrue: [
+            assessment := self simulatedAssessmentForVerdict: #review.
+            aSubmission promptVersion: 'simulated'.
+        ] ifFalse: [
+            "Usa AI reale"
+            assessmentGenerator ifNil: [ self error: 'No assessment generator configured' ].
+            
+            "Ottieni prompt dal registry"
+            prompt := ATPromptRegistry current activePromptForTrack: aSubmission track.
+            prompt ifNotNil: [
+                assessmentGenerator editorialPrompt: prompt content.
+                aSubmission promptVersion: aSubmission track asString, ' v', prompt version ].
+            
+            assessment := assessmentGenerator assessSubmission: aSubmission ].
+    ] on: Error do: [ :e |
+        "Errore -> rimuovi da processedIds per permettere retry"
+        processedIds remove: aSubmission id ifAbsent: [].
+        ATAuditLog current logError: e messageText forSubmission: aSubmission.
+        self error: e messageText ].
     
+    "Parse verdict"
     verdict := self parseVerdict: assessment.
+    
     config := assessmentGenerator 
         ifNotNil: [ assessmentGenerator configurationDictionary ]
         ifNil: [ Dictionary new at: 'mode' put: 'simulated'; yourself ].
     
-    "Log - usa log separato per test"
+    "Log"
     self isTestMode 
         ifTrue: [ ATAuditLog current logTestAssessment: aSubmission verdict: verdict assessment: assessment ]
         ifFalse: [ ATAuditLog current logAssessment: aSubmission verdict: verdict assessment: assessment config: config ].
     
-    "Marca come processata"
-    processedIds add: aSubmission id.
-    
-    "In semiAuto, aggiungi a pending e aspetta approvazione"
+    "SEMI-AUTO: tutto va in pending per decisione manuale"
     mode = #semiAuto ifTrue: [
         pendingApprovals add: (ATPendingApproval
             submission: aSubmission
@@ -324,8 +369,48 @@ ATAutomation >> processSubmission: aSubmission [
             verdict: verdict).
         ^ #pendingApproval ].
     
-    "In fullAuto, processa immediatamente"
+    "FULL-AUTO: aiFailure va in pending, tutto il resto viene eseguito"
+    verdict = #aiFailure ifTrue: [
+        ATAuditLog current logError: 'AI failure, requires manual review' forSubmission: aSubmission.
+        pendingApprovals add: (ATPendingApproval
+            submission: aSubmission
+            assessment: assessment
+            verdict: verdict).
+        ^ #pendingApproval ].
+    
+    "accept/reject/review -> esegui"
     ^ self executeDecision: verdict forSubmission: aSubmission withAssessment: assessment
+]
+
+{ #category : 'as yet unclassified' }
+ATAutomation >> regenerateAssessmentAtIndex: anIndex [
+    "Rigenera l'assessment per un item pending"
+    | pending newAssessment newVerdict |
+    (anIndex < 1 or: [ anIndex > pendingApprovals size ]) ifTrue: [ ^ nil ].
+    
+    pending := pendingApprovals at: anIndex.
+    
+    assessmentGenerator ifNil: [ ^ self error: 'No assessment generator configured' ].
+    
+    [ newAssessment := assessmentGenerator assessSubmission: pending submission ]
+        on: Error
+        do: [ :e | 
+            newAssessment := 'AI ERROR: ', e messageText.
+            ATAuditLog current logError: 'Regenerate failed: ', e messageText forSubmission: pending submission ].
+    
+    newVerdict := self parseVerdict: newAssessment.
+    
+    "Aggiorna il pending"
+    pending assessment: newAssessment.
+    pending verdict: newVerdict.
+    
+    ATAuditLog current logAssessment: pending submission 
+        verdict: newVerdict 
+        assessment: newAssessment 
+        config: (assessmentGenerator configurationDictionary 
+            at: 'note' put: 'regenerated'; yourself).
+    
+    ^ newVerdict
 ]
 
 { #category : 'manual actions' }

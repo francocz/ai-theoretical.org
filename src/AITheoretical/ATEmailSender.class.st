@@ -9,6 +9,12 @@ Class {
 	#package : 'AITheoretical'
 }
 
+{ #category : 'as yet unclassified' }
+ATEmailSender class >> sendTo: email subject: subject body: body [
+    "Invia email con solo testo"
+    self new sendTo: email subject: subject text: body html: nil
+]
+
 { #category : 'instance creation' }
 ATEmailSender class >> withApiKey: aString [
 	^ self new apiKey: aString; yourself
@@ -69,6 +75,21 @@ ATEmailSender >> sendRejectionTo: aSubmission withAssessment: assessment [
 		'Best regards,' , lf ,
 		'AI-Theoretical Editorial System'.
 	^ self sendTo: aSubmission authorEmail subject: subject text: text html: nil
+]
+
+{ #category : 'as yet unclassified' }
+ATEmailSender >> sendRevisionRequestTo: aSubmission withAssessment: assessment [
+    | subject text lf |
+    lf := String lf.
+    subject := 'Revision requested - AI-Theoretical'.
+    text := 'Dear ', aSubmission authorName, ',' , lf , lf ,
+        'Thank you for your submission "' , aSubmission title , '" to AI-Theoretical.' , lf , lf ,
+        'Our review indicates that your paper shows promise but requires revision before it can be considered for publication.' , lf , lf ,
+        '=== AI ASSESSMENT ===' , lf , assessment , lf , lf ,
+        'We invite you to revise your paper based on the feedback above and resubmit. Please note that resubmissions are treated as new submissions and will undergo a fresh review.' , lf , lf ,
+        'Best regards,' , lf ,
+        'AI-Theoretical Editorial System'.
+    ^ self sendTo: aSubmission authorEmail subject: subject text: text html: nil
 ]
 
 { #category : 'sending' }

@@ -73,20 +73,21 @@ ATManifestoPage >> fileName [
 
 { #category : 'generating' }
 ATManifestoPage >> head [
-	^ String streamContents: [ :s |
-		s << '<head>'; << String lf.
-		s << '    <meta charset="UTF-8">'; << String lf.
-		s << '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'; << String lf.
-		s << '    <title>'; << self title; << '</title>'; << String lf.
-		s << '    <meta name="description" content="'; << self description; << '">'; << String lf.
-		s << '    <meta property="og:title" content="'; << self title; << '">'; << String lf.
-		s << '    <meta property="og:description" content="A new framework for human-AI co-authorship in theoretical disciplines.">'; << String lf.
-		s << '    <meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; << String lf.
-		s << self fonts.
-		s << '    <style>'; << String lf.
-		s << self css.
-		s << '    </style>'; << String lf.
-		s << '</head>'; << String lf ]
+    ^ String streamContents: [ :s |
+        s << '<head>'; << String lf.
+        s << '    <meta charset="UTF-8">'; << String lf.
+        s << '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'; << String lf.
+        s << '    <link rel="icon" type="image/svg+xml" href="favicon.svg">'; << String lf.
+        s << '    <title>'; << self title; << '</title>'; << String lf.
+        s << '    <meta name="description" content="'; << self description; << '">'; << String lf.
+        s << '    <meta property="og:title" content="'; << self title; << '">'; << String lf.
+        s << '    <meta property="og:description" content="A new framework for human-AI co-authorship in theoretical disciplines.">'; << String lf.
+        s << '    <meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; << String lf.
+        s << self fonts.
+        s << '    <style>'; << String lf.
+        s << self css.
+        s << '    </style>'; << String lf.
+        s << '</head>'; << String lf ]
 ]
 
 { #category : 'accessing' }

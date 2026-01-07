@@ -86,38 +86,42 @@ ATSiteGenerator >> generateAllSeoPages [
 
 { #category : 'generating' }
 ATSiteGenerator >> generateSeoPageFor: aPaper [
-| papersDir html |
-papersDir := self ensurePapersDirectory.
-html := self seoPageForPaper: aPaper.
-(papersDir / (aPaper slug, '.html')) writeStreamDo: [ :stream |
-    stream nextPutAll: html ].
-^ aPaper slug
+    | papersDir html file |
+    papersDir := self ensurePapersDirectory.
+    html := self seoPageForPaper: aPaper.
+    file := papersDir / (aPaper slug, '.html').
+    file ensureDelete.
+    file writeStreamDo: [ :stream |
+        stream nextPutAll: html ].
+    ^ aPaper slug
 ]
 
 { #category : 'generating' }
 ATSiteGenerator >> generateSitemap [
-	"Genera sitemap.xml con pagine statiche + SEO dei paper attivi"
-	| stream baseUrl activePapers |
-	baseUrl := 'https://ai-theoretical.org'.
-	activePapers := self activePapers.
-	stream := WriteStream on: String new.
-	stream nextPutAll: '<?xml version="1.0" encoding="UTF-8"?>'; cr.
-	stream nextPutAll: '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'; cr.
-	"Pagine statiche"
-	self staticPages do: [ :page |
-		stream nextPutAll: '<url><loc>'.
-		stream nextPutAll: baseUrl; nextPutAll: '/'.
-		stream nextPutAll: (page = 'index.html' ifTrue: [ '' ] ifFalse: [ page ]).
-		stream nextPutAll: '</loc></url>'; cr ].
-	"Solo paper attivi"
-	activePapers do: [ :paper |
-		stream nextPutAll: '<url><loc>'.
-		stream nextPutAll: baseUrl; nextPutAll: '/papers/'; nextPutAll: paper slug; nextPutAll: '.html'.
-		stream nextPutAll: '</loc></url>'; cr ].
-	stream nextPutAll: '</urlset>'.
-	(outputPath asFileReference / 'sitemap.xml') writeStreamDo: [ :f |
-		f nextPutAll: stream contents ].
-	^ self staticPages size + activePapers size
+    "Genera sitemap.xml con pagine statiche + SEO dei paper attivi"
+    | stream baseUrl activePapers file |
+    baseUrl := 'https://ai-theoretical.org'.
+    activePapers := self activePapers.
+    stream := WriteStream on: String new.
+    stream nextPutAll: '<?xml version="1.0" encoding="UTF-8"?>'; cr.
+    stream nextPutAll: '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'; cr.
+    "Pagine statiche"
+    self staticPages do: [ :page |
+        stream nextPutAll: '<url><loc>'.
+        stream nextPutAll: baseUrl; nextPutAll: '/'.
+        stream nextPutAll: (page = 'index.html' ifTrue: [ '' ] ifFalse: [ page ]).
+        stream nextPutAll: '</loc></url>'; cr ].
+    "Solo paper attivi"
+    activePapers do: [ :paper |
+        stream nextPutAll: '<url><loc>'.
+        stream nextPutAll: baseUrl; nextPutAll: '/papers/'; nextPutAll: paper slug; nextPutAll: '.html'.
+        stream nextPutAll: '</loc></url>'; cr ].
+    stream nextPutAll: '</urlset>'.
+    file := outputPath asFileReference / 'sitemap.xml'.
+    file ensureDelete.
+    file writeStreamDo: [ :f |
+        f nextPutAll: stream contents ].
+    ^ self staticPages size + activePapers size
 ]
 
 { #category : 'accessing' }
@@ -221,51 +225,52 @@ repository := aRepo
 
 { #category : 'generating' }
 ATSiteGenerator >> seoPageForPaper: aPaper [
-	"Genera pagina HTML completa per un paper con meta tags SEO/OG"
-	| stream abstract dateStr truncatedAbstract |
-	stream := WriteStream on: String new.
-	abstract := aPaper abstract ifNil: [ '' ].
-	truncatedAbstract := self truncateAbstract: abstract.
-	dateStr := aPaper date ifNil: [ '' ] ifNotNil: [ :d | d asString ].
-	
-	stream nextPutAll: '<!DOCTYPE html>'; lf.
-	stream nextPutAll: '<html lang="en">'; lf.
-	stream nextPutAll: '<head>'; lf.
-	stream nextPutAll: '<meta charset="UTF-8">'; lf.
-	stream nextPutAll: '<meta name="viewport" content="width=device-width, initial-scale=1.0">'; lf.
-	
-	"Robots directive"
-	aPaper isWithdrawn ifTrue: [
-		stream nextPutAll: '<meta name="robots" content="noindex">'; lf ].
-	
-	"Title"
-	stream nextPutAll: '<title>'; nextPutAll: (self escapeHtml: aPaper title); nextPutAll: ' — AI-Theoretical</title>'; lf.
-	
-	"Standard meta"
-	stream nextPutAll: '<meta name="description" content="'; nextPutAll: (self escapeHtml: truncatedAbstract); nextPutAll: '">'; lf.
-	stream nextPutAll: '<meta name="keywords" content="AI, theoretical papers, human-AI collaboration, '; nextPutAll: (self escapeHtml: aPaper authors); nextPutAll: '">'; lf.
-	
-	"Open Graph"
-	stream nextPutAll: '<meta property="og:title" content="'; nextPutAll: (self escapeHtml: aPaper title); nextPutAll: ' — AI-Theoretical">'; lf.
-	stream nextPutAll: '<meta property="og:description" content="'; nextPutAll: (self escapeHtml: truncatedAbstract); nextPutAll: '">'; lf.
-	stream nextPutAll: '<meta property="og:url" content="https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html">'; lf.
-	stream nextPutAll: '<meta property="og:type" content="article">'; lf.
-	stream nextPutAll: '<meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; lf.
-	
-	"Canonical"
-	stream nextPutAll: '<link rel="canonical" href="https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html">'; lf.
-	
-	"Fonts and CSS"
-	stream nextPutAll: '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">'; lf.
-	stream nextPutAll: '<style>'; nextPutAll: self paperPageCSS; nextPutAll: '</style>'; lf.
-	stream nextPutAll: '</head>'; lf.
-	stream nextPutAll: '<body>'; lf.
-	stream nextPutAll: '<div class="container">'; lf.
-	stream nextPutAll: '<nav><a href="/">← Back to AI-Theoretical</a></nav>'; lf.
-	self renderPaperContent: aPaper to: stream.
-	stream nextPutAll: '</div>'; lf.
-	stream nextPutAll: '</body></html>'.
-	^ stream contents
+    "Genera pagina HTML completa per un paper con meta tags SEO/OG"
+    | stream abstract dateStr truncatedAbstract |
+    stream := WriteStream on: String new.
+    abstract := aPaper abstract ifNil: [ '' ].
+    truncatedAbstract := self truncateAbstract: abstract.
+    dateStr := aPaper date ifNil: [ '' ] ifNotNil: [ :d | d asString ].
+    
+    stream nextPutAll: '<!DOCTYPE html>'; lf.
+    stream nextPutAll: '<html lang="en">'; lf.
+    stream nextPutAll: '<head>'; lf.
+    stream nextPutAll: '<meta charset="UTF-8">'; lf.
+    stream nextPutAll: '<meta name="viewport" content="width=device-width, initial-scale=1.0">'; lf.
+    stream nextPutAll: '<link rel="icon" type="image/svg+xml" href="../favicon.svg">'; lf.
+    
+    "Robots directive"
+    aPaper isWithdrawn ifTrue: [
+        stream nextPutAll: '<meta name="robots" content="noindex">'; lf ].
+    
+    "Title"
+    stream nextPutAll: '<title>'; nextPutAll: (self escapeHtml: aPaper title); nextPutAll: ' — AI-Theoretical</title>'; lf.
+    
+    "Standard meta"
+    stream nextPutAll: '<meta name="description" content="'; nextPutAll: (self escapeHtml: truncatedAbstract); nextPutAll: '">'; lf.
+    stream nextPutAll: '<meta name="keywords" content="AI, theoretical papers, human-AI collaboration, '; nextPutAll: (self escapeHtml: aPaper authors); nextPutAll: '">'; lf.
+    
+    "Open Graph"
+    stream nextPutAll: '<meta property="og:title" content="'; nextPutAll: (self escapeHtml: aPaper title); nextPutAll: ' — AI-Theoretical">'; lf.
+    stream nextPutAll: '<meta property="og:description" content="'; nextPutAll: (self escapeHtml: truncatedAbstract); nextPutAll: '">'; lf.
+    stream nextPutAll: '<meta property="og:url" content="https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html">'; lf.
+    stream nextPutAll: '<meta property="og:type" content="article">'; lf.
+    stream nextPutAll: '<meta property="og:image" content="https://ai-theoretical.org/og-image.jpg">'; lf.
+    
+    "Canonical"
+    stream nextPutAll: '<link rel="canonical" href="https://ai-theoretical.org/papers/'; nextPutAll: aPaper slug; nextPutAll: '.html">'; lf.
+    
+    "Fonts and CSS"
+    stream nextPutAll: '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">'; lf.
+    stream nextPutAll: '<style>'; nextPutAll: self paperPageCSS; nextPutAll: '</style>'; lf.
+    stream nextPutAll: '</head>'; lf.
+    stream nextPutAll: '<body>'; lf.
+    stream nextPutAll: '<div class="container">'; lf.
+    stream nextPutAll: '<nav><a href="/">← Back to AI-Theoretical</a></nav>'; lf.
+    self renderPaperContent: aPaper to: stream.
+    stream nextPutAll: '</div>'; lf.
+    stream nextPutAll: '</body></html>'.
+    ^ stream contents
 ]
 
 { #category : 'accessing' }

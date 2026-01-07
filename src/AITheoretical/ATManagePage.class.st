@@ -1,0 +1,361 @@
+Class {
+	#name : 'ATManagePage',
+	#superclass : 'ATStaticPage',
+	#category : 'AITheoretical',
+	#package : 'AITheoretical'
+}
+
+{ #category : 'as yet unclassified' }
+ATManagePage >> content [
+    ^ '<div class="container">
+
+<h1>Manage Your Papers</h1>
+<hr>
+
+<div id="loading" class="loading">Loading your papers...</div>
+<div id="error" class="error" style="display:none"></div>
+<div id="expired" class="expired" style="display:none">
+    <h2>Link Expired</h2>
+    <p>This access link has expired. Please <a href="update.html">request a new one</a>.</p>
+</div>
+<div id="papers" style="display:none"></div>
+
+<!-- Withdraw Modal -->
+<div id="withdrawModal" class="modal">
+    <div class="modal-content">
+        <h2>Withdraw Paper</h2>
+        <p>Are you sure you want to withdraw "<span id="withdrawTitle"></span>"?</p>
+        <p>The paper will be marked as withdrawn and no longer publicly accessible.</p>
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-confirm" id="confirmWithdraw">Withdraw</button>
+    </div>
+</div>
+
+<!-- Version Modal -->
+<div id="versionModal" class="modal">
+    <div class="modal-content">
+        <h2>Upload New Version</h2>
+        <p>Uploading new version for "<span id="versionTitle"></span>"</p>
+        <label>New PDF file:</label>
+        <input type="file" id="newPdf" accept=".pdf">
+        <label>Category (optional change):</label>
+        <select id="newTrack">
+            <option value="">Keep current category</option>
+            <option value="researchPreprint">Research Preprint</option>
+            <option value="workingPaper">Working Paper</option>
+            <option value="expositoryEssay">Expository Essay</option>
+            <option value="criticalReview">Critical Review</option>
+        </select>
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-version" id="confirmVersion">Upload New Version</button>
+    </div>
+</div>
+
+</div>
+
+', self manageScript, self footer
+]
+
+{ #category : 'as yet unclassified' }
+ATManagePage >> css [
+    ^ '
+body {
+    font-family: "Inter", sans-serif;
+    background: #fafafa;
+    color: #1a1a1a;
+    line-height: 1.7;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+h1 {
+    font-family: "Playfair Display", serif;
+    font-size: 2rem;
+    margin: 20px 0;
+}
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+.loading, .error, .expired {
+    text-align: center;
+    padding: 60px 20px;
+}
+.error { color: #c00; }
+.paper-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.paper-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+.paper-meta {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+.paper-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.status-published { background: #e6f4ea; color: #1e7e34; }
+.status-withdrawn { background: #fce8e6; color: #c5221f; }
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.btn-withdraw { background: #fee; color: #c00; border: 1px solid #fcc; }
+.btn-withdraw:hover { background: #fdd; }
+.btn-version { background: #1a1a1a; color: white; }
+.btn-version:hover { background: #333; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+.modal-content {
+    background: white;
+    max-width: 500px;
+    margin: 100px auto;
+    padding: 30px;
+    border-radius: 8px;
+}
+.modal h2 { margin-top: 0; }
+.modal .btn { margin-top: 15px; margin-right: 10px; }
+.btn-cancel { background: #eee; color: #333; }
+.btn-confirm { background: #c00; color: white; }
+select, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+.success-msg {
+    background: #e6f4ea;
+    color: #1e7e34;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+'
+]
+
+{ #category : 'as yet unclassified' }
+ATManagePage >> description [
+    ^ 'Manage, update, or withdraw your published papers.'
+]
+
+{ #category : 'as yet unclassified' }
+ATManagePage >> fileName [
+    ^ 'manage.html'
+]
+
+{ #category : 'as yet unclassified' }
+ATManagePage >> head [
+    ^ String streamContents: [ :s |
+        s << '<head>'; << String lf.
+        s << '    <meta charset="UTF-8">'; << String lf.
+        s << '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'; << String lf.
+        s << '    <link rel="icon" type="image/svg+xml" href="favicon.svg">'; << String lf.
+        s << '    <title>'; << self title; << '</title>'; << String lf.
+        s << '    <meta name="robots" content="noindex">'; << String lf.
+        s << self fonts.
+        s << '    <style>'; << String lf.
+        s << self css.
+        s << '    </style>'; << String lf.
+        s << '</head>'; << String lf ]
+]
+
+{ #category : 'as yet unclassified' }
+ATManagePage >> manageScript [
+    ^ '
+<script>
+let currentToken = null;
+let currentSlug = null;
+let papers = [];
+
+async function init() {
+    const params = new URLSearchParams(window.location.search);
+    currentToken = params.get("token");
+    
+    if (!currentToken) {
+        showError("No access token provided.");
+        return;
+    }
+    
+    try {
+        const response = await fetch("https://api.ai-theoretical.org/manage/papers?token=" + currentToken);
+        const data = await response.json();
+        
+        if (data.expired) {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("expired").style.display = "block";
+            return;
+        }
+        
+        if (!data.success) {
+            showError(data.error || "Failed to load papers.");
+            return;
+        }
+        
+        papers = data.papers;
+        renderPapers();
+    } catch (err) {
+        showError("Connection error. Please try again.");
+    }
+}
+
+function showError(msg) {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("error").textContent = msg;
+    document.getElementById("error").style.display = "block";
+}
+
+function renderPapers() {
+    document.getElementById("loading").style.display = "none";
+    const container = document.getElementById("papers");
+    container.style.display = "block";
+    
+    if (papers.length === 0) {
+        container.innerHTML = "<p>No papers found.</p>";
+        return;
+    }
+    
+    container.innerHTML = papers.map(p => `
+        <div class="paper-card">
+            <div class="paper-title">${p.title}</div>
+            <div class="paper-meta">
+                ${p.track} • ${p.date} • 
+                <span class="paper-status ${p.withdrawn ? \\\"status-withdrawn\\\" : \\\"status-published\\\"}">${p.withdrawn ? \\\"Withdrawn\\\" : \\\"Published\\\"}</span>
+            </div>
+            <div class="actions">
+                ${p.withdrawn ? \\\"\\\" : `<button class="btn btn-withdraw" onclick="showWithdraw(\\\"${p.slug}\\\", \\\"${p.title.replace(/\\\"/g, \\\"\\\")}\\\")">Withdraw</button>`}
+                ${p.withdrawn ? \\\"\\\" : `<button class="btn btn-version" onclick="showVersion(\\\"${p.slug}\\\", \\\"${p.title.replace(/\\\"/g, \\\"\\\")}\\\")">New Version</button>`}
+            </div>
+        </div>
+    `).join("");
+}
+
+function showWithdraw(slug, title) {
+    currentSlug = slug;
+    document.getElementById("withdrawTitle").textContent = title;
+    document.getElementById("withdrawModal").style.display = "block";
+}
+
+function showVersion(slug, title) {
+    currentSlug = slug;
+    document.getElementById("versionTitle").textContent = title;
+    document.getElementById("versionModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("withdrawModal").style.display = "none";
+    document.getElementById("versionModal").style.display = "none";
+    currentSlug = null;
+}
+
+document.getElementById("confirmWithdraw").onclick = async function() {
+    this.disabled = true;
+    this.textContent = "Withdrawing...";
+    
+    try {
+        const response = await fetch("https://api.ai-theoretical.org/manage/withdraw", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: currentToken, slug: currentSlug })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            closeModal();
+            location.reload();
+        } else {
+            alert(data.error || "Failed to withdraw paper.");
+        }
+    } catch (err) {
+        alert("Connection error.");
+    }
+    
+    this.disabled = false;
+    this.textContent = "Withdraw";
+};
+
+document.getElementById("confirmVersion").onclick = async function() {
+    const fileInput = document.getElementById("newPdf");
+    const newTrack = document.getElementById("newTrack").value;
+    
+    if (!fileInput.files[0]) {
+        alert("Please select a PDF file.");
+        return;
+    }
+    
+    this.disabled = true;
+    this.textContent = "Uploading...";
+    
+    const formData = new FormData();
+    formData.append("token", currentToken);
+    formData.append("slug", currentSlug);
+    formData.append("pdf", fileInput.files[0]);
+    if (newTrack) formData.append("track", newTrack);
+    
+    try {
+        const response = await fetch("https://api.ai-theoretical.org/manage/version", {
+            method: "POST",
+            body: formData
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            closeModal();
+            location.reload();
+        } else {
+            alert(data.error || "Failed to upload new version.");
+        }
+    } catch (err) {
+        alert("Connection error.");
+    }
+    
+    this.disabled = false;
+    this.textContent = "Upload New Version";
+};
+
+window.onclick = function(e) {
+    if (e.target.classList.contains("modal")) closeModal();
+};
+
+init();
+</script>
+'
+]
+
+{ #category : 'as yet unclassified' }
+ATManagePage >> title [
+    ^ 'Manage Your Papers - AI-Theoretical'
+]

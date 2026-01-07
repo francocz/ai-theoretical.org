@@ -20,7 +20,8 @@ Class {
 		'hasCode',
 		'track',
 		'isTest',
-		'promptVersion'
+		'promptVersion',
+		'coAuthors'
 	],
 	#category : 'AITheoretical',
 	#package : 'AITheoretical'
@@ -35,6 +36,7 @@ ATSubmission class >> fromDictionary: aDict [
         authorName: (aDict at: 'authorName' ifAbsent: [ '' ]);
         authorEmail: (aDict at: 'authorEmail' ifAbsent: [ '' ]);
         authorAffiliation: (aDict at: 'authorAffiliation' ifAbsent: [ nil ]);
+        coAuthors: (aDict at: 'coAuthors' ifAbsent: [ '' ]);
         title: (aDict at: 'title' ifAbsent: [ '' ]);
         abstract: (aDict at: 'abstract' ifAbsent: [ '' ]);
         aiModels: (aDict at: 'aiModels' ifAbsent: [ '' ]);
@@ -78,35 +80,42 @@ aiModels := anObject
 
 { #category : 'converting' }
 ATSubmission >> asDictionary [
-	^ Dictionary new
-		at: 'authorName' put: authorName;
-		at: 'authorEmail' put: authorEmail;
-		at: 'authorAffiliation' put: (authorAffiliation ifNil: [ '' ]);
-		at: 'title' put: title;
-		at: 'abstract' put: abstract;
-		at: 'aiModels' put: aiModels;
-		at: 'pdfUrl' put: pdfUrl;
-		at: 'submittedAt' put: submittedAt asString;
-		at: 'status' put: status asString;
-		at: 'codeZipKey' put: codeZipKey;
-		at: 'hasCode' put: self hasCode;
-		yourself
+    ^ Dictionary new
+        at: 'authorName' put: authorName;
+        at: 'authorEmail' put: authorEmail;
+        at: 'authorAffiliation' put: (authorAffiliation ifNil: [ '' ]);
+        at: 'coAuthors' put: self coAuthors;
+        at: 'title' put: title;
+        at: 'abstract' put: abstract;
+        at: 'aiModels' put: aiModels;
+        at: 'pdfUrl' put: pdfUrl;
+        at: 'submittedAt' put: submittedAt asString;
+        at: 'status' put: status asString;
+        at: 'codeZipKey' put: codeZipKey;
+        at: 'hasCode' put: self hasCode;
+        yourself
 ]
 
 { #category : 'converting' }
 ATSubmission >> asPaper [
     "Crea un ATPaper da questa submission. Usare solo dopo accettazione."
-    | paper |
+    | paper authorDisplay |
+    
+    "Costruisco la stringa authors completa"
+    authorDisplay := authorName.
+    authorAffiliation ifNotNil: [ :aff | 
+        aff isEmpty ifFalse: [ authorDisplay := authorDisplay, ' (', aff, ')' ] ].
+    (coAuthors notNil and: [ coAuthors notEmpty ]) ifTrue: [
+        authorDisplay := authorDisplay, ', ', coAuthors ].
+    
     paper := ATPaper new
         title: title;
-        authors: authorName;
+        authors: authorDisplay;
         aiModels: aiModels;
         abstract: abstract;
         track: self track;
         generateSlug;
         yourself.
-    authorAffiliation ifNotNil: [ :aff |
-        paper authors: (authorName, ' (', aff, ')') ].
     ^ paper
 ]
 
@@ -138,6 +147,16 @@ ATSubmission >> authorName [
 { #category : 'accessing' }
 ATSubmission >> authorName: anObject [
 authorName := anObject
+]
+
+{ #category : 'as yet unclassified' }
+ATSubmission >> coAuthors [
+    ^ coAuthors ifNil: [ '' ]
+]
+
+{ #category : 'as yet unclassified' }
+ATSubmission >> coAuthors: aString [
+    coAuthors := aString
 ]
 
 { #category : 'accessing' }

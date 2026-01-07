@@ -242,3 +242,191 @@ footer a {
     h1 { font-size: 2.2rem; }
 }'
 ]
+
+{ #category : 'as yet unclassified' }
+ATStyles class >> trackFiltersCss [
+    ^ '
+/* Track filters */
+.track-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.track-btn {
+    background: #f5f5f3;
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-muted);
+}
+
+.track-btn:hover {
+    background: #eee;
+}
+
+.track-btn.active {
+    background: var(--text-main);
+    color: white;
+    border-color: var(--text-main);
+}
+
+.track-count {
+    display: inline-block;
+    background: rgba(0,0,0,0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    margin-left: 6px;
+}
+
+.track-btn.active .track-count {
+    background: rgba(255,255,255,0.2);
+}
+
+/* View controls */
+.view-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 4px;
+}
+
+.view-btn {
+    background: #f5f5f3;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.view-btn:hover {
+    background: #eee;
+}
+
+.view-btn.active {
+    background: var(--text-main);
+    color: white;
+    border-color: var(--text-main);
+}
+
+.sort-select {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-main);
+}
+
+/* Track badges - pastel colors */
+.paper-track-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.track-researchPreprint {
+    background: #e8f4f8;
+    color: #2c5f6e;
+}
+
+.track-workingPaper {
+    background: #f0f4e8;
+    color: #4a5f3c;
+}
+
+.track-expositoryEssay {
+    background: #faf3e8;
+    color: #6b5a3f;
+}
+
+.track-criticalReview {
+    background: #f3e8f4;
+    color: #5f3c6b;
+}
+
+/* Compact view */
+.compact-list {
+    border-top: 1px solid var(--border);
+}
+
+.compact-item {
+    display: grid;
+    grid-template-columns: 30px 1fr auto auto;
+    gap: 15px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+.compact-track {
+    font-size: 1.1rem;
+}
+
+.compact-title {
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.compact-title:hover {
+    color: var(--accent-blue);
+}
+
+.compact-author {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.compact-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 40px 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.pagination button {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+.pagination button:hover {
+    background: #f5f5f3;
+}
+
+.page-info {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+'
+]
