@@ -1,1 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://ai-theoretical.org/</loc></url><url><loc>https://ai-theoretical.org/manifesto.html</loc></url><url><loc>https://ai-theoretical.org/editorial-framework.html</loc></url><url><loc>https://ai-theoretical.org/ai-editorial-prompts.html</loc></url><url><loc>https://ai-theoretical.org/invite.html</loc></url><url><loc>https://ai-theoretical.org/submit.html</loc></url><url><loc>https://ai-theoretical.org/papers/image-based-development-with-llm-agents.html</loc></url><url><loc>https://ai-theoretical.org/papers/wave-function-collapse-as-lie.html</loc></url><url><loc>https://ai-theoretical.org/papers/the-invisible-pillar-on-the.html</loc></url><url><loc>https://ai-theoretical.org/papers/the-invisible-wealth-mismeasurement-of.html</loc></url><url><loc>https://ai-theoretical.org/papers/the-stack-of-local-representations.html</loc></url><url><loc>https://ai-theoretical.org/papers/image-based-development-with-llm-agents-2.html</loc></url></urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://ai-theoretical.org/</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/manifesto.html</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/editorial-principles.html</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/ai-editorial-prompt.html</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/invite.html</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/submit.html</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/submit-form.html</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/author-access.html</loc><lastmod>2026-01-07</lastmod></url>
+<url><loc>https://ai-theoretical.org/papers/image-based-development-with-llm-agents.html</loc><lastmod>2026-01-07</lastmod><priority>0.8</priority></url>
+<url><loc>https://ai-theoretical.org/papers/wave-function-collapse-as-lie.html</loc><lastmod>2026-01-07</lastmod><priority>0.8</priority></url>
+<url><loc>https://ai-theoretical.org/papers/the-invisible-pillar-on-the.html</loc><lastmod>2026-01-07</lastmod><priority>0.8</priority></url>
+<url><loc>https://ai-theoretical.org/papers/the-invisible-wealth-mismeasurement-of.html</loc><lastmod>2026-01-07</lastmod><priority>0.8</priority></url>
+<url><loc>https://ai-theoretical.org/papers/the-stack-of-local-representations.html</loc><lastmod>2026-01-07</lastmod><priority>0.8</priority></url>
+</urlset>
