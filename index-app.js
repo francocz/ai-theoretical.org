@@ -7,7 +7,7 @@ let allPapers = [];
 let currentTrack = "all";
 let currentView = "full";
 let currentPage = 1;
-let searchId = 0; // To track and cancel stale searches
+let searchId = 0;
 const PAPERS_PER_PAGE = 10;
 
 // Algolia configuration
@@ -56,7 +56,14 @@ function highlightText(text, query) {
     return text.replace(regex, '<span class="highlight">$1</span>');
 }
 
-// Render with given papers
+// Verify that a paper actually contains the search terms
+function paperContainsQuery(paper, query) {
+    var q = query.toLowerCase();
+    var words = q.split(/\s+/).filter(function(w) { return w.length > 0; });
+    var text = (paper.title + " " + paper.author + " " + (paper.abstract || "")).toLowerCase();
+    return words.every(function(word) { return text.indexOf(word) >= 0; });
+}
+
 function doRender(papers, query) {
     if (currentView === "full") {
         renderFull(papers, query);
@@ -67,7 +74,6 @@ function doRender(papers, query) {
     updateTrackCounts();
 }
 
-// Main render function
 function render() {
     currentPage = 1;
     var query = searchInput.value.trim();
@@ -82,49 +88,41 @@ function render() {
     
     // Algolia search
     if (algoliaIndex) {
-        // Increment search ID to invalidate stale responses
         searchId++;
         var thisSearchId = searchId;
         var thisQuery = query;
-        var thisTrack = currentTrack;
-        
-        console.log("Starting Algolia search #" + thisSearchId + " for: " + thisQuery);
         
         algoliaIndex.search(thisQuery, { hitsPerPage: 100 }).then(function(results) {
-            // Check if this search is still current
-            if (thisSearchId !== searchId) {
-                console.log("Ignoring stale search #" + thisSearchId + " (current is #" + searchId + ")");
-                return;
-            }
-            
-            console.log("Algolia returned " + results.hits.length + " hits for search #" + thisSearchId);
-            results.hits.forEach(function(h) {
-                console.log("  - " + h.slug + ": " + h.title.substring(0, 50));
-            });
+            if (thisSearchId !== searchId) return;
             
             // Get slugs from Algolia results
             var slugs = results.hits.map(function(h) { return h.slug; });
             
-            // Find matching local papers (to get full data)
-            var matchedPapers = activePapers.filter(function(p) {
+            // Find matching local papers
+            var candidatePapers = activePapers.filter(function(p) {
                 return slugs.indexOf(p.slug) >= 0;
             });
             
-            // Apply track filter
-            var filtered = applyTrackFilter(matchedPapers);
+            // VERIFY: filter out false positives from Algolia
+            var verifiedPapers = candidatePapers.filter(function(p) {
+                return paperContainsQuery(p, thisQuery);
+            });
             
-            console.log("After track filter: " + filtered.length + " papers");
+            // Apply track filter
+            var filtered = applyTrackFilter(verifiedPapers);
             
             doRender(sortPapers(filtered), thisQuery);
         }).catch(function(err) {
             console.error("Algolia error:", err);
-            // Fallback: no results
             doRender([], query);
         });
     } else {
-        // No Algolia: show nothing for search (or implement local search)
-        console.log("No Algolia, showing empty results");
-        doRender([], query);
+        // No Algolia: local search only
+        var results = activePapers.filter(function(p) {
+            return paperContainsQuery(p, query);
+        });
+        var filtered = applyTrackFilter(results);
+        doRender(sortPapers(filtered), query);
     }
 }
 
@@ -269,7 +267,6 @@ function init() {
     
     initAlgolia();
     
-    // Track buttons
     document.querySelectorAll(".track-btn").forEach(function(btn) {
         btn.addEventListener("click", function() {
             document.querySelectorAll(".track-btn").forEach(function(b) { b.classList.remove("active"); });
@@ -279,7 +276,6 @@ function init() {
         });
     });
     
-    // View buttons
     document.querySelectorAll(".view-btn").forEach(function(btn) {
         btn.addEventListener("click", function() {
             document.querySelectorAll(".view-btn").forEach(function(b) { b.classList.remove("active"); });
@@ -289,16 +285,13 @@ function init() {
         });
     });
     
-    // Search input with debounce
     searchInput.addEventListener("input", function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(render, 300);
     });
     
-    // Sort change
     sortSelect.addEventListener("change", render);
     
-    // Initial render
     render();
 }
 
