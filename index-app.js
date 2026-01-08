@@ -7,61 +7,13 @@ let allPapers = [];
 let currentTrack = "all";
 let currentView = "full";
 let currentPage = 1;
+let searchResults = null; // null = no search active, array = search results
 const PAPERS_PER_PAGE = 10;
 
 // Algolia configuration
 const ALGOLIA_APP_ID = "KXM87UO2YZ";
 const ALGOLIA_SEARCH_KEY = "9007e1d3d632c25e106acd34be41425c";
 let algoliaIndex = null;
-
-function initAlgolia() {
-    if (typeof algoliasearch !== "undefined") {
-        algoliaIndex = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY).initIndex("papers");
-    }
-}
-
-function doAlgoliaSearch() {
-    var query = searchInput.value.trim();
-    
-    // If empty query, reset to normal view
-    if (!query) { 
-        filterAndRender(); 
-        return; 
-    }
-    
-    // Minimum 3 characters
-    if (query.length < 3) {
-        filterAndRender();
-        return;
-    }
-    
-    if (!algoliaIndex) { 
-        filterAndRender(); 
-        return; 
-    }
-    
-    var filters = currentTrack !== "all" ? "track:" + currentTrack : "";
-    algoliaIndex.search(query, { filters: filters, hitsPerPage: 50 }).then(function(results) {
-        // Map Algolia results back to local papers to get full data (ai_assessment, notes, etc)
-        var papers = [];
-        results.hits.forEach(function(h) {
-            var localPaper = allPapers.find(function(p) { return p.slug === h.slug; });
-            if (localPaper && localPaper.status === "active") {
-                papers.push(localPaper);
-            }
-        });
-        
-        currentPage = 1;
-        if (currentView === "full") { 
-            renderPapersFull(papers, query); 
-        } else { 
-            renderPapersCompact(papers, query); 
-        }
-        searchStatus.innerHTML = "<strong>" + papers.length + "</strong> result" + (papers.length !== 1 ? "s" : "") + " for \"" + query + "\"";
-    }).catch(function() { 
-        filterAndRender(); 
-    });
-}
 
 const TRACK_INFO = {
     researchPreprint: { label: "Research Preprint", icon: "📚" },
@@ -70,39 +22,27 @@ const TRACK_INFO = {
     criticalReview: { label: "Critical Review", icon: "🔍" }
 };
 
-function highlightText(text, query) {
-    if (!query || !text) return text;
-    const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-    if (words.length === 0) return text;
-    const regex = new RegExp("(" + words.join("|") + ")", "gi");
-    return text.replace(regex, '<span class="highlight">$1</span>');
+function initAlgolia() {
+    if (typeof algoliasearch !== "undefined") {
+        algoliaIndex = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY).initIndex("papers");
+    }
 }
 
-function matchesPaper(paper, query) {
-    if (!query) return true;
-    const q = query.toLowerCase();
-    const words = q.split(/\s+/).filter(w => w.length > 0);
-    const searchable = (paper.title + " " + paper.author + " " + (paper.abstract || "") + " " + (paper.ai_model || "")).toLowerCase();
-    return words.every(word => searchable.includes(word));
-}
-
+// Get active papers from local data
 function getActivePapers() {
-    return allPapers.filter(p => p.status === "active");
+    return allPapers.filter(function(p) { return p.status === "active"; });
 }
 
-function getFilteredPapers() {
-    const query = searchInput.value.trim();
-    let filtered = getActivePapers().filter(p => {
-        if (!matchesPaper(p, query)) return false;
-        if (currentTrack !== "all" && p.track !== currentTrack) return false;
-        return true;
-    });
-    return sortPapers(filtered);
+// Apply track filter to a list of papers
+function applyTrackFilter(papers) {
+    if (currentTrack === "all") return papers;
+    return papers.filter(function(p) { return p.track === currentTrack; });
 }
 
+// Sort papers
 function sortPapers(papers) {
-    const sort = sortSelect.value;
-    return papers.sort((a, b) => {
+    var sort = sortSelect.value;
+    return papers.slice().sort(function(a, b) {
         if (sort === "date-desc") return (b.date || "").localeCompare(a.date || "");
         if (sort === "date-asc") return (a.date || "").localeCompare(b.date || "");
         if (sort === "title-asc") return a.title.localeCompare(b.title);
@@ -111,35 +51,97 @@ function sortPapers(papers) {
     });
 }
 
-function filterAndRender() {
-    currentPage = 1;
-    renderAll();
+// Get papers to display (combines search results with track filter)
+function getPapersToDisplay() {
+    var base = searchResults !== null ? searchResults : getActivePapers();
+    var filtered = applyTrackFilter(base);
+    return sortPapers(filtered);
 }
 
-function renderAll() {
-    const filtered = getFilteredPapers();
-    const query = searchInput.value.trim();
+// Execute Algolia search
+function doSearch() {
+    var query = searchInput.value.trim();
     
-    if (currentView === "full") {
-        renderPapersFull(filtered, query);
-    } else {
-        renderPapersCompact(filtered, query);
+    // Less than 3 chars: clear search, show all
+    if (query.length < 3) {
+        searchResults = null;
+        currentPage = 1;
+        render();
+        return;
     }
     
-    updateStatus(filtered.length, getActivePapers().length);
+    // No Algolia: fallback to local search
+    if (!algoliaIndex) {
+        doLocalSearch(query);
+        return;
+    }
+    
+    // Algolia search (no track filter here - we filter after)
+    algoliaIndex.search(query, { hitsPerPage: 100 }).then(function(results) {
+        // Map to local papers to get full data and verify they exist
+        var papers = [];
+        results.hits.forEach(function(hit) {
+            var local = allPapers.find(function(p) { return p.slug === hit.slug && p.status === "active"; });
+            if (local) {
+                papers.push(local);
+            }
+        });
+        searchResults = papers;
+        currentPage = 1;
+        render();
+    }).catch(function(err) {
+        console.error("Algolia error:", err);
+        doLocalSearch(query);
+    });
+}
+
+// Local search fallback
+function doLocalSearch(query) {
+    var q = query.toLowerCase();
+    var words = q.split(/\s+/).filter(function(w) { return w.length > 0; });
+    
+    searchResults = getActivePapers().filter(function(p) {
+        var text = (p.title + " " + p.author + " " + (p.abstract || "")).toLowerCase();
+        return words.every(function(word) { return text.indexOf(word) >= 0; });
+    });
+    currentPage = 1;
+    render();
+}
+
+// Main render function
+function render() {
+    var papers = getPapersToDisplay();
+    var query = searchInput.value.trim();
+    var highlightQuery = query.length >= 3 ? query : "";
+    
+    if (currentView === "full") {
+        renderFull(papers, highlightQuery);
+    } else {
+        renderCompact(papers, highlightQuery);
+    }
+    
+    updateStatus(papers);
     updateTrackCounts();
 }
 
-function renderPapersFull(papers, query) {
-    const start = (currentPage - 1) * PAPERS_PER_PAGE;
-    const pageItems = papers.slice(start, start + PAPERS_PER_PAGE);
+function highlightText(text, query) {
+    if (!query || !text) return text;
+    var words = query.toLowerCase().split(/\s+/).filter(function(w) { return w.length > 2; });
+    if (words.length === 0) return text;
+    var regex = new RegExp("(" + words.join("|") + ")", "gi");
+    return text.replace(regex, '<span class="highlight">$1</span>');
+}
+
+function renderFull(papers, query) {
+    var start = (currentPage - 1) * PAPERS_PER_PAGE;
+    var pageItems = papers.slice(start, start + PAPERS_PER_PAGE);
     
-    let html = pageItems.map((p, idx) => {
-        const i = start + idx;
-        const title = highlightText(p.title, query);
-        const author = highlightText(p.author, query);
-        const abstract = highlightText(p.abstract, query);
-        const trackInfo = TRACK_INFO[p.track] || { label: "Paper", icon: "📄" };
+    var html = pageItems.map(function(p, idx) {
+        var i = start + idx;
+        var title = highlightText(p.title, query);
+        var author = highlightText(p.author, query);
+        var abstract = highlightText(p.abstract, query);
+        var trackInfo = TRACK_INFO[p.track] || { label: "Paper", icon: "📄" };
         
         return '<article class="paper-entry">' +
             '<div class="paper-track-badge track-' + p.track + '">' + trackInfo.icon + ' ' + trackInfo.label + '</div>' +
@@ -149,35 +151,45 @@ function renderPapersFull(papers, query) {
                 (p.date ? ' · ' + p.date : '') + (p.pages ? ' · ' + p.pages + ' pages' : '') +
             '</div>' +
             '<div class="btn-group">' +
-                '<a href="' + p.pdf_file + '" class="btn btn-black" download>Download PDF</a>' +
+                '<a href="' + p.pdf_file + '" class="btn btn-black download-link">Download PDF</a>' +
                 '<button class="btn btn-white" onclick="toggle(\'abs-' + i + '\')">Abstract</button>' +
-                (p.ai_assessment ? '<button class="btn btn-white" onclick="toggle(\'ass-' + i + '\')">AI Assessment</button>' : '') +
+                '<button class="btn btn-white" onclick="toggle(\'ass-' + i + '\')">AI Assessment</button>' +
                 (p.notes ? '<button class="btn btn-white" onclick="toggle(\'notes-' + i + '\')">Notes</button>' : '') +
             '</div>' +
             '<div id="abs-' + i + '" class="abstract-panel">' +
                 '<strong>Abstract:</strong><br><br>' + abstract +
             '</div>' +
-            (p.ai_assessment ? '<div id="ass-' + i + '" class="abstract-panel"><strong>AI Editorial Assessment:</strong><br><br><pre style="white-space: pre-wrap; font-family: inherit;">' + p.ai_assessment + '</pre></div>' : '') +
+            '<div id="ass-' + i + '" class="abstract-panel"><strong>AI Editorial Assessment:</strong><br><br><pre style="white-space: pre-wrap; font-family: inherit;">' + p.ai_assessment + '</pre></div>' +
             (p.notes ? '<div id="notes-' + i + '" class="abstract-panel"><strong>Notes on AI Collaboration:</strong><br><br><pre style="white-space: pre-wrap; font-family: inherit;">' + p.notes + '</pre></div>' : '') +
         '</article>';
     }).join("");
     
     html += renderPagination(papers.length);
     repo.innerHTML = html;
+    
+    // Attach download confirmation handlers
+    document.querySelectorAll(".download-link").forEach(function(link) {
+        link.addEventListener("click", function(e) {
+            var filename = link.href.split("/").pop();
+            if (!confirm("Download " + filename + "?")) {
+                e.preventDefault();
+            }
+        });
+    });
 }
 
-function renderPapersCompact(papers, query) {
-    const start = (currentPage - 1) * PAPERS_PER_PAGE;
-    const pageItems = papers.slice(start, start + PAPERS_PER_PAGE);
+function renderCompact(papers, query) {
+    var start = (currentPage - 1) * PAPERS_PER_PAGE;
+    var pageItems = papers.slice(start, start + PAPERS_PER_PAGE);
     
-    let html = '<div class="compact-list">';
-    html += pageItems.map(p => {
-        const title = highlightText(p.title, query);
-        const trackInfo = TRACK_INFO[p.track] || { label: "Paper", icon: "📄" };
+    var html = '<div class="compact-list">';
+    html += pageItems.map(function(p) {
+        var title = highlightText(p.title, query);
+        var trackInfo = TRACK_INFO[p.track] || { label: "Paper", icon: "📄" };
         
         return '<div class="compact-item">' +
             '<span class="compact-track track-' + p.track + '">' + trackInfo.icon + '</span>' +
-            '<a href="' + p.pdf_file + '" class="compact-title" download>' + title + '</a>' +
+            '<a href="' + p.pdf_file + '" class="compact-title download-link">' + title + '</a>' +
             '<span class="compact-author">' + p.author + '</span>' +
             '<span class="compact-date">' + (p.date || "") + '</span>' +
         '</div>';
@@ -186,13 +198,23 @@ function renderPapersCompact(papers, query) {
     
     html += renderPagination(papers.length);
     repo.innerHTML = html;
+    
+    // Attach download confirmation handlers
+    document.querySelectorAll(".download-link").forEach(function(link) {
+        link.addEventListener("click", function(e) {
+            var filename = link.href.split("/").pop();
+            if (!confirm("Download " + filename + "?")) {
+                e.preventDefault();
+            }
+        });
+    });
 }
 
 function renderPagination(total) {
-    const totalPages = Math.ceil(total / PAPERS_PER_PAGE);
+    var totalPages = Math.ceil(total / PAPERS_PER_PAGE);
     if (totalPages <= 1) return "";
     
-    let html = '<div class="pagination">';
+    var html = '<div class="pagination">';
     if (currentPage > 1) {
         html += '<button onclick="goToPage(' + (currentPage - 1) + ')">← Prev</button>';
     }
@@ -206,55 +228,52 @@ function renderPagination(total) {
 
 function goToPage(page) {
     currentPage = page;
-    renderAll();
+    render();
     repo.scrollIntoView({ behavior: "smooth" });
 }
 
-function updateStatus(shown, total) {
-    const query = searchInput.value.trim();
-    const hasFilters = query || currentTrack !== "all";
-    if (hasFilters) {
-        searchStatus.innerHTML = 'Showing <strong>' + shown + '</strong> of ' + total + ' papers';
+function updateStatus(papers) {
+    var total = getActivePapers().length;
+    var query = searchInput.value.trim();
+    
+    if (query.length >= 3) {
+        searchStatus.innerHTML = '<strong>' + papers.length + '</strong> result' + (papers.length !== 1 ? 's' : '') + ' for "' + query + '"';
+    } else if (currentTrack !== "all") {
+        searchStatus.innerHTML = 'Showing <strong>' + papers.length + '</strong> of ' + total + ' papers';
     } else {
         searchStatus.innerHTML = '<strong>' + total + '</strong> papers published';
     }
 }
 
 function updateTrackCounts() {
-    const activePapers = getActivePapers();
-    document.querySelectorAll(".track-btn").forEach(btn => {
-        const track = btn.dataset.track;
-        let count;
+    var activePapers = getActivePapers();
+    document.querySelectorAll(".track-btn").forEach(function(btn) {
+        var track = btn.dataset.track;
+        var count;
         if (track === "all") {
             count = activePapers.length;
         } else {
-            count = activePapers.filter(p => p.track === track).length;
+            count = activePapers.filter(function(p) { return p.track === track; }).length;
         }
-        const existing = btn.querySelector(".track-count");
+        var existing = btn.querySelector(".track-count");
         if (existing) existing.remove();
-        btn.childNodes.forEach(node => {
+        btn.childNodes.forEach(function(node) {
             if (node.nodeType === 3) {
                 node.textContent = node.textContent.replace(/\s*\d+\s*$/, '');
             }
         });
-        const countSpan = document.createElement("span");
+        var countSpan = document.createElement("span");
         countSpan.className = "track-count";
         countSpan.textContent = count;
         btn.appendChild(countSpan);
     });
 }
 
-function clearFilters() {
-    searchInput.value = "";
-    currentTrack = "all";
-    document.querySelectorAll(".track-btn").forEach(b => b.classList.remove("active"));
-    document.querySelector('.track-btn[data-track="all"]').classList.add("active");
-    filterAndRender();
-}
-
 function toggle(id) { 
     document.getElementById(id).classList.toggle("show"); 
 }
+
+var searchTimeout = null;
 
 function init() {
     if (typeof PAPERS_DATA === "undefined") return;
@@ -262,44 +281,39 @@ function init() {
     
     initAlgolia();
     
-    document.querySelectorAll(".track-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll(".track-btn").forEach(b => b.classList.remove("active"));
+    // Track buttons
+    document.querySelectorAll(".track-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".track-btn").forEach(function(b) { b.classList.remove("active"); });
             btn.classList.add("active");
             currentTrack = btn.dataset.track;
-            // If there's a search query, re-run Algolia search with new track filter
-            if (searchInput.value.trim().length >= 3) {
-                doAlgoliaSearch();
-            } else {
-                filterAndRender();
-            }
+            currentPage = 1;
+            render();
         });
     });
     
-    document.querySelectorAll(".view-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+    // View buttons
+    document.querySelectorAll(".view-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".view-btn").forEach(function(b) { b.classList.remove("active"); });
             btn.classList.add("active");
             currentView = btn.dataset.view;
-            renderAll();
+            render();
         });
     });
     
-    // Search on Enter
-    searchInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") doAlgoliaSearch();
-    });
-    
-    // Reset when clearing the search field
+    // Search input with debounce
     searchInput.addEventListener("input", function() {
-        if (searchInput.value.trim() === "") {
-            filterAndRender();
-        }
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(doSearch, 300);
     });
     
-    sortSelect.addEventListener("change", filterAndRender);
+    // Sort change
+    sortSelect.addEventListener("change", function() {
+        render();
+    });
     
-    renderAll();
+    render();
 }
 
 window.onload = init;
