@@ -80,7 +80,7 @@ footer a:hover {
 
 { #category : 'css' }
 ATStyles class >> indexCss [
-	^ '
+    ^ '
 /* HEADER */
 header { padding: 60px 0 30px; }
 .top-subtitle { 
@@ -145,7 +145,7 @@ hr { border: 0; border-top: 1px solid var(--border); margin-bottom: 50px; }
 }
 .search-box {
     display: flex;
-    gap: 10px;
+    gap: 0;
     flex-wrap: wrap;
     align-items: center;
 }
@@ -155,11 +155,26 @@ hr { border: 0; border-top: 1px solid var(--border); margin-bottom: 50px; }
     padding: 12px 16px;
     font-size: 0.95rem;
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 4px 0 0 4px;
     font-family: inherit;
 }
 .search-input:focus {
     outline: none;
+    border-color: var(--accent-blue);
+}
+.search-btn {
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    background: var(--text-main);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.search-btn:hover {
+    background: var(--accent-blue);
     border-color: var(--accent-blue);
 }
 .search-filters {
