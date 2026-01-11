@@ -1,0 +1,17 @@
+{
+	"globalUsage" : {
+		"anthropic" : {
+			"inputTokens" : 111669,
+			"outputTokens" : 5811,
+			"calls" : 5
+		}
+	},
+	"resettableUsage" : {
+		"anthropic" : {
+			"inputTokens" : 111669,
+			"outputTokens" : 5811,
+			"calls" : 4
+		}
+	},
+	"lastReset" : "2026-01-07T14:24:56.256979+01:00"
+}
