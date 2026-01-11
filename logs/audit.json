@@ -672,5 +672,37 @@
 		"author" : "Franco Cazzaniga",
 		"type" : "assessment",
 		"promptHash" : "28777176"
+	},
+	{
+		"outputTokens" : 393,
+		"inputTokens" : 2835,
+		"timestamp" : "2026-01-11T16:33:53.630836+01:00",
+		"submissionId" : "abf157f4-05a4-4259-b305-925cf082ef3f",
+		"estimatedCostUSD" : 0.0144,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-5-20250929",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-5-20250929",
+		"verdict" : "reject",
+		"title" : "E2E Test Paper - 2026-01-11T16:31:00.881116+01:00",
+		"assessmentLength" : 1769,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-11T16:33:53.651304+01:00",
+		"assessment" : "# EDITORIAL ASSESSMENT\n\n## (A) STRUCTURED SUMMARY\n\n1) Category: Working paper (as declared by author).\n2) Aims: The text presents no explicit aims beyond identifying itself as an automated test submission.\n3) Correctness: No errors identified.\n4) Coherence: Inadequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Low (Transparent).\n7) Novelty: Consolidative.\n8) Bibliography: Insufficient.\n9) Effectiveness: Fails to achieve aims.\n10) Cross-framework traction: Low. Cognitively closed.\n11) Claims: Unsupported assertions.\n12) Contribution: Absent.\n13) Structure: Inadequate.\n14) Integrity: No issues.\n15) Code (if provided): Not provided.\n16) Editorial outcome: Not suitable for this platform.\n17) Authors list: [\"Test Author\"]\n\n## (B) EXTENDED ASSESSMENT\n\nThe submitted document contains no substantive content beyond a title, author attribution, and an abstract explicitly identifying it as an automated test submission. The attached PDF is blank, providing no theoretical argument, empirical analysis, methodological framework, or bibliographic apparatus. The submission fails to meet the minimum threshold for intellectual contribution required by a working paper platform. While working papers are expected to present developing ideas and may exhibit incomplete bibliographies or structural imperfections, they must nonetheless articulate a theoretical position, research question, or conceptual intervention. This submission offers none of these elements. The text is cognitively closed, offering no traction across frameworks or disciplines, and makes no claims that could be evaluated for support or validity. The absence of any substantive contribution renders it unsuitable for inclusion, regardless of track designation. Not suitable for this platform.",
+		"promptVersion" : "2.0",
+		"submissionId" : "abf157f4-05a4-4259-b305-925cf082ef3f",
+		"temperature" : 0,
+		"author" : "Test Author",
+		"type" : "assessment",
+		"promptHash" : "30776123"
+	},
+	{
+		"timestamp" : "2026-01-11T16:33:54.230751+01:00",
+		"submissionId" : "abf157f4-05a4-4259-b305-925cf082ef3f",
+		"title" : "E2E Test Paper - 2026-01-11T16:31:00.881116+01:00",
+		"type" : "decision",
+		"decision" : "reject"
 	}
 ]
