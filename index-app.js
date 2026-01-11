@@ -146,6 +146,7 @@ function renderFull(papers, query) {
             '</div>' +
             '<div class="btn-group">' +
                 '<a href="' + p.pdf_file + '" class="btn btn-black download-link">Download PDF</a>' +
+                (p.code_archive ? '<a href="' + p.code_archive + '" class="btn btn-black download-link">Download Code</a>' : '') +
                 '<button class="btn btn-white" onclick="toggle(\'abs-' + i + '\')">Abstract</button>' +
                 '<button class="btn btn-white" onclick="toggle(\'ass-' + i + '\')">AI Assessment</button>' +
                 (p.notes ? '<button class="btn btn-white" onclick="toggle(\'notes-' + i + '\')">Notes</button>' : '') +
