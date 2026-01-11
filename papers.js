@@ -203,8 +203,9 @@ into the coherent structure presented here.`
         ai_model: `Claude Opus 4.5, ChatGpt 5.2`,
         date: `2026-01-11`,
         pages: ``,
-        pdf_file: `secularized-purity-cross-platform-evidence-for.pdf`,
-        seo_page: `secularized-purity-cross-platform-evidence-for.html`,
+        pdf_file: `papers/secularized-purity-cross-platform-evidence-for.pdf`,
+        code_archive: `papers/secularized-purity-cross-platform-evidence-for.zip`,
+        seo_page: `papers/secularized-purity-cross-platform-evidence-for.html`,
         slug: `the-stack-of-local-representations`,
         track: `researchPreprint`,
         version: 1,
@@ -235,3 +236,4 @@ Editorial outcome: Suitable for inclusion as a research preprint.`,
         notes: ``
     }
 ];
+
