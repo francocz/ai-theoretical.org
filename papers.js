@@ -203,7 +203,7 @@ into the coherent structure presented here.`
         ai_model: `Claude Opus 4.5, ChatGpt 5.2`,
         date: `2026-01-11`,
         pages: ``,
-        pdf_file: `secularized-purity-cross-platform-evidence-for.pdf`,
+        pdf_file: `papers/secularized-purity-cross-platform-evidence-for.pdf`,
         seo_page: `secularized-purity-cross-platform-evidence-for.html`,
         slug: `secularized-purity-cross-platform-evidence-for`,
         track: `researchPreprint`,
