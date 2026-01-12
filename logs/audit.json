@@ -704,5 +704,37 @@
 		"title" : "E2E Test Paper - 2026-01-11T16:31:00.881116+01:00",
 		"type" : "decision",
 		"decision" : "reject"
+	},
+	{
+		"outputTokens" : 400,
+		"inputTokens" : 2835,
+		"timestamp" : "2026-01-11T16:39:05.266732+01:00",
+		"submissionId" : "99451177-4c9c-43c3-9cb8-5b093aa1387e",
+		"estimatedCostUSD" : 0.014505,
+		"provider" : "anthropic",
+		"model" : "claude-sonnet-4-5-20250929",
+		"type" : "token_usage"
+	},
+	{
+		"model" : "claude-sonnet-4-5-20250929",
+		"verdict" : "reject",
+		"title" : "E2E Test Paper - 2026-01-11T16:36:05.386663+01:00",
+		"assessmentLength" : 1754,
+		"provider" : "anthropic",
+		"timestamp" : "2026-01-11T16:39:05.285592+01:00",
+		"assessment" : "(A) STRUCTURED SUMMARY\n\n1) Category: Working paper (as declared by author).\n2) Aims: The text presents no explicit aims; it is declared as an automated end-to-end test submission to be ignored.\n3) Correctness: No errors identified.\n4) Coherence: Inadequate.\n5) Consistency: Consistent.\n6) Semantic opacity: Low (Transparent).\n7) Novelty: Consolidative.\n8) Bibliography: Insufficient.\n9) Effectiveness: Fails to achieve aims.\n10) Cross-framework traction: Low. This submission is cognitively closed.\n11) Claims: Unsupported assertions.\n12) Contribution: Absent.\n13) Structure: Inadequate.\n14) Integrity: No issues.\n15) Code (if provided): Not provided.\n16) Editorial outcome: Not suitable for this platform.\n17) Authors list: [\"Test Author\"]\n\n(B) EXTENDED ASSESSMENT\n\nThe submitted document is an automated test file with no substantive content. The PDF contains only blank pages, and the abstract explicitly requests that the submission be ignored. No theoretical argument, empirical analysis, or intellectual contribution is present. The text lacks aims, coherence, bibliography, and structure necessary for evaluation as a working paper. The submission exhibits no novelty and makes no claims that could be assessed for support or validity. Cross-framework traction is absent, as there is no framework or theoretical position articulated. The contribution is entirely absent, triggering mandatory rejection under the decision rules. While the submission raises no integrity concerns and contains no errors (as there is no content to contain errors), it fails all substantive criteria for inclusion on a platform hosting theoretical working papers. The document does not meet the minimum threshold for academic discourse. Not suitable for this platform.",
+		"promptVersion" : "2.0",
+		"submissionId" : "99451177-4c9c-43c3-9cb8-5b093aa1387e",
+		"temperature" : 0,
+		"author" : "Test Author",
+		"type" : "assessment",
+		"promptHash" : "30776123"
+	},
+	{
+		"timestamp" : "2026-01-11T16:39:05.890664+01:00",
+		"submissionId" : "99451177-4c9c-43c3-9cb8-5b093aa1387e",
+		"title" : "E2E Test Paper - 2026-01-11T16:36:05.386663+01:00",
+		"type" : "decision",
+		"decision" : "reject"
 	}
 ]
